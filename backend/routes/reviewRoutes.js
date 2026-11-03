@@ -4,7 +4,7 @@ const express = require("express");
 const {
   createReview,
   getProviderReviews
-} = require("../controllers/reviewController");
+} = require("../controllers/ProviderControllers/reviewController");
 
 const {
   authenticateUser,

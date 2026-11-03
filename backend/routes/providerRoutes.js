@@ -6,7 +6,7 @@ const {
   getProviderById,
   createProviderProfile,
   updateProviderProfile
-} = require("../controllers/providerController");
+} = require("../controllers/ProviderControllers/providerController");
 
 const {
   authenticateUser,

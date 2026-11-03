@@ -7,7 +7,7 @@ const {
   getProviderRequests,
   updateRequestStatus,
   cancelRequest
-} = require("../controllers/requestController");
+} = require("../controllers/ProviderControllers/requestController");
 
 const {
   authenticateUser,
