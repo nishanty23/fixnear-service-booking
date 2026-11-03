@@ -76,8 +76,8 @@ Role-based authorization protects restricted API operations.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/nishanty23/ticket-booking-system.git
-cd ticket-booking-system
+git clone https://github.com/nishanty23/fixnear-service-booking.git
+cd fixnear-service-booking
 ```
 
 ### 2. Install backend dependencies
