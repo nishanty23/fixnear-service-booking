@@ -1,0 +1,56 @@
+
+const express = require("express");
+
+const {
+  createRequest,
+  getMyRequests,
+  getProviderRequests,
+  updateRequestStatus,
+  cancelRequest
+} = require("../controllers/requestController");
+
+const {
+  authenticateUser,
+  authorizeRoles
+} = require("../middleware/authMiddleware");
+
+const router = express.Router();
+
+// Customer routes
+router.post(
+  "/",
+  authenticateUser,
+  authorizeRoles("USER"),
+  createRequest
+);
+
+router.get(
+  "/my",
+  authenticateUser,
+  authorizeRoles("USER"),
+  getMyRequests
+);
+
+router.put(
+  "/:id/cancel",
+  authenticateUser,
+  authorizeRoles("USER"),
+  cancelRequest
+);
+
+// Service provider routes
+router.get(
+  "/provider",
+  authenticateUser,
+  authorizeRoles("SERVICE_PROVIDER"),
+  getProviderRequests
+);
+
+router.put(
+  "/:id/status",
+  authenticateUser,
+  authorizeRoles("SERVICE_PROVIDER"),
+  updateRequestStatus
+);
+
+module.exports = router;

@@ -1,339 +1,192 @@
-# Ticket Booking System
+# FixNear – Local Service Booking Platform
 
-A full-stack **MERN ticket booking system** where users can browse events, select shows and seats, and manage their bookings. Organizers can create and manage events and shows, while administrators can monitor users, events, and bookings.
+FixNear is a full-stack web application that connects customers with nearby service professionals such as plumbers, electricians, AC technicians, carpenters, and appliance repair technicians.
 
-The project focuses on building a practical booking system with **authentication, role-based authorization, REST APIs, MongoDB, seat management, and concurrency-safe booking**.
+Customers can explore services, compare providers, submit service requests, and review completed work. Service providers can manage their profiles, list services, and handle customer requests.
 
 ## Features
 
-### User
+### Customer
+- Register and log in securely.
+- Browse service categories and available services.
+- Discover service providers.
+- Submit and manage service requests.
+- Cancel eligible requests.
+- Review completed services.
 
-- Register and login
-- JWT-based authentication
-- Browse available events
-- View shows for an event
-- Select available seats
-- Book one or multiple seats
-- View booking history
-- Cancel bookings
-- Protected user dashboard
-
-### Organizer
-
-- Secure organizer login
-- Create events
-- Update events
-- Delete events
-- Create and manage shows
-- Manage show seat layouts
-- View bookings for their events
+### Service Provider
+- Register and create a service provider profile.
+- Manage business information and availability.
+- Add, update, and deactivate services.
+- View incoming service requests.
+- Accept, reject, and update request statuses.
 
 ### Admin
+- Manage service categories.
+- Access admin-protected operations.
 
-- Admin authentication
-- View users
-- View events
-- View bookings
-- Monitor booking activity
-- Manage platform data
+## Technology Stack
 
-### Booking System
+| Layer | Technology |
+|---|---|
+| Frontend | React |
+| Backend | Node.js, Express.js |
+| Database | MongoDB Atlas |
+| ODM | Mongoose |
+| Authentication | JWT |
+| Password Security | bcryptjs |
+| API Testing | Postman |
+| Version Control | Git and GitHub |
 
-- Interactive seat selection
-- Available/booked seat status
-- Multiple-seat booking
-- Booking confirmation
-- Booking history
-- Booking cancellation
-- Cancelled seats become available again
-- Prevention of duplicate seat bookings
-- Server-side validation
-
-## Tech Stack
-
-### Frontend
-
-- React
-- React Router
-- JavaScript
-- HTML
-- CSS
-
-### Backend
-
-- Node.js
-- Express.js
-- REST API
-- JWT
-- bcryptjs
-
-### Database
-
-- MongoDB
-- Mongoose
-
-### Development
-
-- Git
-- GitHub
-- npm
-- Nodemon
-
-## Project Architecture
+## Project Structure
 
 ```text
-ticket-booking-system/
+FixNear/
 │
 ├── backend/
 │   ├── config/
+│   │   └── db.js
 │   ├── controllers/
 │   ├── middleware/
 │   ├── models/
 │   ├── routes/
-│   ├── services/
-│   ├── utils/
 │   ├── .env
-│   ├── .gitignore
-│   ├── server.js
-│   └── package.json
+│   ├── package.json
+│   └── server.js
 │
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   ├── pages/
-    │   ├── services/
-    │   ├── context/
-    │   ├── App.jsx
-    │   └── main.jsx
-    └── package.json
+├── frontend/
+│
+└── README.md
 ```
 
-## Application Flow
+*The frontend and backend structure may evolve as development continues.*
 
-```text
-                    ┌──────────────┐
-                    │     User     │
-                    └──────┬───────┘
-                           │
-                           ▼
-                    Browse Events
-                           │
-                           ▼
-                     Select Show
-                           │
-                           ▼
-                     Select Seats
-                           │
-                           ▼
-                     Confirm Booking
-                           │
-                           ▼
-                    Booking Created
-                           │
-                           ▼
-                    My Bookings
-```
+## User Roles
 
-Organizer flow:
+FixNear supports three roles:
 
-```text
-Organizer
-    │
-    ▼
-Create Event
-    │
-    ▼
-Create Show
-    │
-    ▼
-Configure Seats
-    │
-    ▼
-Manage Event Bookings
-```
+- `USER` – Customers who request services.
+- `SERVICE_PROVIDER` – Professionals who offer services.
+- `ADMIN` – Administrators who manage platform data.
 
-## Authentication
+Role-based authorization protects restricted API operations.
 
-The application uses **JWT-based authentication**.
-
-After successful login:
-
-```text
-User
-  │
-  ▼
-Login
-  │
-  ▼
-Server validates credentials
-  │
-  ▼
-JWT generated
-  │
-  ▼
-Client stores authentication state
-  │
-  ▼
-JWT sent with protected requests
-```
-
-The backend uses role-based middleware to restrict access to specific resources.
-
-Roles:
-
-```text
-USER
-ORGANIZER
-ADMIN
-```
-
-## Booking Safety
-
-A major goal of this project is to prevent the same seat from being booked by multiple users.
-
-For example:
-
-```text
-User A ──┐
-         ├──► Seat A5
-User B ──┘
-```
-
-If both users attempt to book the seat at nearly the same time, the backend must ensure that only one booking succeeds.
-
-This involves server-side availability checks and appropriate MongoDB operations/transactions to maintain data consistency.
-
-## API Structure
-
-The backend follows a layered architecture:
-
-```text
-Request
-   │
-   ▼
-Route
-   │
-   ▼
-Middleware
-   │
-   ▼
-Controller
-   │
-   ▼
-Service
-   │
-   ▼
-Model
-   │
-   ▼
-MongoDB
-```
-
-This keeps routing, business logic, authentication, and database operations separated.
-
-## Planned API Modules
-
-```text
-/auth
-/users
-/events
-/shows
-/seats
-/bookings
-/admin
-```
-
-## Installation
+## Backend Setup
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ticket-booking-system.git
+git clone https://github.com/nishanty23/ticket-booking-system.git
 cd ticket-booking-system
 ```
 
-### 2. Backend setup
+### 2. Install backend dependencies
 
 ```bash
 cd backend
 npm install
 ```
 
-Create a `.env` file:
+### 3. Configure environment variables
+
+Create a `.env` file inside the `backend` directory.
 
 ```env
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
+JWT_SECRET=your_jwt_secret
 ```
 
-Start the backend:
+Use your own MongoDB Atlas connection string and a strong JWT secret. Do not commit this file to GitHub.
+
+### 4. Start the backend server
+
+Development mode:
 
 ```bash
 npm run dev
 ```
 
-### 3. Frontend setup
-
-Open another terminal:
+Normal mode:
 
 ```bash
-cd frontend
-npm install
-npm run dev
+npm start
 ```
 
-## Environment Variables
+The backend runs at:
 
-The backend requires:
+```text
+http://localhost:5000
+```
 
-| Variable | Description |
-|---|---|
-| `PORT` | Port used by the Express server |
-| `MONGO_URI` | MongoDB connection string |
-| `JWT_SECRET` | Secret used to sign JWT tokens |
+Test the root endpoint:
 
-Never commit the `.env` file to GitHub.
+```http
+GET http://localhost:5000/
+```
+
+## API Routes
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/auth/register` | Register a user |
+| POST | `/api/auth/login` | Log in |
+| GET | `/api/auth/me` | Get authenticated user's profile |
+| GET | `/api/categories` | Get service categories |
+| POST | `/api/categories` | Create a category (Admin) |
+| PUT | `/api/categories/:id` | Update a category (Admin) |
+| DELETE | `/api/categories/:id` | Delete a category (Admin) |
+| GET | `/api/providers` | Browse service providers |
+| GET | `/api/providers/:id` | Get provider details |
+| POST | `/api/providers/profile` | Create provider profile |
+| PUT | `/api/providers/profile` | Update provider profile |
+| GET | `/api/services` | Browse services |
+| GET | `/api/services/:id` | Get service details |
+| POST | `/api/services` | Create a service |
+| PUT | `/api/services/:id` | Update a service |
+| DELETE | `/api/services/:id` | Deactivate a service |
+| POST | `/api/requests` | Submit a service request |
+| GET | `/api/requests/my` | Get customer's requests |
+| PUT | `/api/requests/:id/cancel` | Cancel an eligible request |
+| GET | `/api/requests/provider` | Get provider's requests |
+| PUT | `/api/requests/:id/status` | Update request status |
+| POST | `/api/reviews` | Submit a review |
+| GET | `/api/reviews/provider/:providerId` | Get provider reviews |
+
+Protected endpoints require a JWT Bearer Token. Role restrictions apply where specified.
+
+## Database Models
+
+The backend uses Mongoose models for:
+
+- User
+- ServiceCategory
+- ServiceProvider
+- Service
+- ServiceRequest
+- Review
+
+These models use MongoDB ObjectId references to represent relationships between customers, providers, services, requests, categories, and reviews.
+
+## Development Status
+
+The backend foundation, MongoDB connection, authentication, role-based authorization, data models, controllers, and API routes have been created.
+
+API testing and frontend development are ongoing. Features will be updated as the project progresses.
+
+## Team Collaboration
+
+This project is developed collaboratively using Git and GitHub.
+
+- `main` is the protected stable branch.
+- Developers should work on separate feature branches.
+- Changes should be submitted through Pull Requests.
+- Changes should be reviewed before merging into `main`.
 
 ## Future Improvements
 
-- Online payment integration
-- Email booking confirmation
-- QR-code based tickets
-- Event search and filtering
-- Pagination
-- Advanced admin analytics
-- Automated booking expiration
-- Email notifications
-- Deployment with a cloud database and hosting platform
-
-## Learning Objectives
-
-This project is designed to demonstrate practical understanding of:
-
-- MERN stack development
-- REST API design
-- MongoDB and Mongoose
-- JWT authentication
-- Password hashing
-- Role-based authorization
-- Middleware
-- CRUD operations
-- Database relationships
-- Input validation
-- Error handling
-- Seat availability management
-- Transactions and concurrency
-- React routing
-- Protected frontend routes
-- Full-stack application architecture
-
-## Status
-
-**🚧 Currently in development**
-
-The project is being developed incrementally, starting with the backend API, database, authentication, and booking system before completing the React frontend.
-
-## License
-
-This project is intended for educational and portfolio purposes.
+- React-based user interface.
+- Location-based provider discovery.
+- Provider availability and scheduling improvements.
+- Booking notifications.
+- Admin dashboard.
