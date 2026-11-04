@@ -1,77 +1,172 @@
 # FixNear – Local Service Booking Platform
 
-FixNear is a full-stack web application that connects customers with nearby service professionals such as plumbers, electricians, AC technicians, carpenters, and appliance repair technicians.
+FixNear is a full-stack web application that connects customers with local service professionals. Customers can discover services, compare prices, book appointments, track service requests and review completed services.
 
-Customers can explore services, compare providers, submit service requests, and review completed work. Service providers can manage their profiles, list services, and handle customer requests.
+Service providers can manage their profiles, list services and handle customer bookings. Administrators can manage service categories.
 
 ## Features
 
 ### Customer
 - Register and log in securely.
-- Browse service categories and available services.
-- Discover service providers.
-- Submit and manage service requests.
-- Cancel eligible requests.
-- Review completed services.
+- Browse available service categories and services.
+- Explore service providers and their pricing.
+- Book services by providing appointment and address details.
+- View booking history and request status.
+- Cancel eligible bookings.
+- Submit ratings and reviews for completed services.
 
 ### Service Provider
-- Register and create a service provider profile.
-- Manage business information and availability.
-- Add, update, and deactivate services.
-- View incoming service requests.
-- Accept, reject, and update request statuses.
+- Log in using a provider account.
+- Create and manage a service provider profile.
+- Add and manage services and prices.
+- View customer booking requests.
+- Accept or reject pending requests.
+- Update booking status to In Progress or Completed.
+- Receive customer ratings and reviews.
 
-### Admin
-- Manage service categories.
-- Access admin-protected operations.
+### Administrator
+- Access the admin dashboard.
+- Create new service categories.
+- View existing categories.
+- Update category names.
+- Delete categories that are not being used by services.
 
 ## Technology Stack
 
-| Layer | Technology |
+| Layer | Technologies |
 |---|---|
-| Frontend | React |
+| Frontend | React.js, HTML, CSS, JavaScript |
 | Backend | Node.js, Express.js |
 | Database | MongoDB Atlas |
 | ODM | Mongoose |
-| Authentication | JWT |
+| Authentication | JSON Web Token (JWT) |
 | Password Security | bcryptjs |
-| API Testing | Postman |
-| Version Control | Git and GitHub |
+| API Communication | Axios, REST API |
+| Routing | React Router |
+| Development Tools | VS Code, Postman, Git, GitHub |
 
-## Project Structure
+## System Architecture
+
+The application follows a client-server architecture.
+
+1. The React frontend provides the user interface.
+2. Axios sends HTTP requests to the Express backend.
+3. Express routes direct requests to the appropriate controllers.
+4. Middleware handles authentication and role-based authorization.
+5. Mongoose communicates with MongoDB Atlas.
+6. The backend returns JSON responses to the frontend.
 
 ```text
-FixNear/
-│
-├── backend/
-│   ├── config/
-│   │   └── db.js
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── .env
-│   ├── package.json
-│   └── server.js
-│
-├── frontend/
-│
-└── README.md
+          React Frontend
+                 |
+              Axios
+                 |
+          Express Server
+                 |
+        Authentication Middleware
+                 |
+             Controllers
+                 |
+              Mongoose
+                 |
+           MongoDB Atlas
 ```
 
-*The frontend and backend structure may evolve as development continues.*
+## Database Design
+
+The application uses the following MongoDB collections:
+
+| Model | Purpose |
+|---|---|
+| User | Stores user details, email, password hash and role |
+| ServiceProvider | Stores provider business profiles and details |
+| ServiceCategory | Stores service categories |
+| Service | Stores services, descriptions and prices |
+| ServiceRequest | Stores customer bookings and their status |
+| Review | Stores customer ratings and feedback |
+
+### Database Relationships
+
+- A User can have one ServiceProvider profile.
+- A ServiceProvider can offer multiple Services.
+- Each Service belongs to a ServiceCategory.
+- A ServiceRequest references a customer, provider and service.
+- A Review references a customer, provider and completed service request.
 
 ## User Roles
 
-FixNear supports three roles:
+The application supports three roles:
 
-- `USER` – Customers who request services.
-- `SERVICE_PROVIDER` – Professionals who offer services.
-- `ADMIN` – Administrators who manage platform data.
+- `USER` – Customer who books services.
+- `SERVICE_PROVIDER` – Professional who provides services.
+- `ADMIN` – Administrator who manages categories.
 
-Role-based authorization protects restricted API operations.
+Role-based authorization ensures that protected operations are available only to permitted users.
 
-## Backend Setup
+## API Endpoints
+
+All API endpoints are prefixed with:
+
+`http://localhost:5000/api`
+
+### Authentication
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/auth/register` | Register a user |
+| POST | `/auth/login` | Log in |
+| GET | `/auth/me` | Get logged-in user details |
+
+### Categories
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/categories` | Get all categories |
+| POST | `/categories` | Create category (Admin) |
+| PUT | `/categories/:id` | Update category (Admin) |
+| DELETE | `/categories/:id` | Delete category (Admin) |
+
+### Services and Providers
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/services` | Browse services |
+| POST | `/services` | Create service (Provider) |
+| PUT | `/services/:id` | Update service (Provider) |
+| DELETE | `/services/:id` | Deactivate service (Provider) |
+| GET | `/providers` | Search providers |
+| POST | `/providers` | Create provider profile |
+| PUT | `/providers` | Update provider profile |
+
+### Service Requests
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/requests` | Create booking |
+| GET | `/requests/my` | Get customer bookings |
+| GET | `/requests/provider` | Get provider bookings |
+| PUT | `/requests/:id/status` | Update booking status |
+| PUT | `/requests/:id/cancel` | Cancel eligible booking |
+
+### Reviews
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/reviews` | Submit a review |
+| GET | `/reviews/provider/:providerId` | Get provider reviews |
+
+Protected endpoints require a valid JWT access token. Role-specific endpoints additionally require the appropriate user role.
+
+## Installation and Setup
+
+### Prerequisites
+
+Install the following:
+
+- Node.js and npm
+- MongoDB Atlas account
+- Git
+- Code editor such as Visual Studio Code
 
 ### 1. Clone the repository
 
@@ -80,113 +175,78 @@ git clone https://github.com/nishanty23/fixnear-service-booking.git
 cd fixnear-service-booking
 ```
 
-### 2. Install backend dependencies
+### 2. Configure the backend
 
 ```bash
 cd backend
 npm install
 ```
 
-### 3. Configure environment variables
+Create a `.env` file using `.env.example` as a reference.
 
-Create a `.env` file inside the `backend` directory.
+Add your MongoDB connection string, JWT secret and other required configuration values using the exact variable names in `.env.example`.
 
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-```
-
-Use your own MongoDB Atlas connection string and a strong JWT secret. Do not commit this file to GitHub.
-
-### 4. Start the backend server
-
-Development mode:
+Start the backend:
 
 ```bash
 npm run dev
 ```
 
-Normal mode:
+Backend URL:
+
+`http://localhost:5000`
+
+### 3. Configure the frontend
+
+Open another terminal:
 
 ```bash
-npm start
+cd frontend
+npm install
+npm run dev
 ```
 
-The backend runs at:
+Frontend URL:
 
-```text
-http://localhost:5000
-```
+`http://localhost:5173`
 
-Test the root endpoint:
+### 4. Run the application
 
-```http
-GET http://localhost:5000/
-```
+Keep both frontend and backend servers running.
 
-## API Routes
+Open the frontend URL in your browser and register or log in to use FixNear.
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/api/auth/register` | Register a user |
-| POST | `/api/auth/login` | Log in |
-| GET | `/api/auth/me` | Get authenticated user's profile |
-| GET | `/api/categories` | Get service categories |
-| POST | `/api/categories` | Create a category (Admin) |
-| PUT | `/api/categories/:id` | Update a category (Admin) |
-| DELETE | `/api/categories/:id` | Delete a category (Admin) |
-| GET | `/api/providers` | Browse service providers |
-| GET | `/api/providers/:id` | Get provider details |
-| POST | `/api/providers/profile` | Create provider profile |
-| PUT | `/api/providers/profile` | Update provider profile |
-| GET | `/api/services` | Browse services |
-| GET | `/api/services/:id` | Get service details |
-| POST | `/api/services` | Create a service |
-| PUT | `/api/services/:id` | Update a service |
-| DELETE | `/api/services/:id` | Deactivate a service |
-| POST | `/api/requests` | Submit a service request |
-| GET | `/api/requests/my` | Get customer's requests |
-| PUT | `/api/requests/:id/cancel` | Cancel an eligible request |
-| GET | `/api/requests/provider` | Get provider's requests |
-| PUT | `/api/requests/:id/status` | Update request status |
-| POST | `/api/reviews` | Submit a review |
-| GET | `/api/reviews/provider/:providerId` | Get provider reviews |
+## Security and Validation
 
-Protected endpoints require a JWT Bearer Token. Role restrictions apply where specified.
+- Passwords are hashed using bcryptjs.
+- JWT is used for authentication.
+- Protected routes use authentication middleware.
+- Role-based authorization restricts administrative and provider operations.
+- Backend validation checks incoming data.
+- Service prices are obtained from database records when creating bookings.
+- Duplicate reviews for the same service request are prevented.
+- Categories referenced by services cannot be deleted.
 
-## Database Models
+## Future Enhancements
 
-The backend uses Mongoose models for:
+- Online payment integration.
+- Real-time booking notifications.
+- Interactive provider location maps.
+- Advanced service search and filters.
+- Provider availability calendar.
+- Email and SMS notifications.
+- Deployment to a cloud hosting platform.
 
-- User
-- ServiceCategory
-- ServiceProvider
-- Service
-- ServiceRequest
-- Review
+## Project Information
 
-These models use MongoDB ObjectId references to represent relationships between customers, providers, services, requests, categories, and reviews.
+**Project Name:** FixNear – Local Service Booking Platform
 
-## Development Status
+**Project Type:** Full-Stack Web Development Project
 
-The backend foundation, MongoDB connection, authentication, role-based authorization, data models, controllers, and API routes have been created.
+**Purpose:** To simplify the process of discovering and booking trusted local service professionals.
 
-API testing and frontend development are ongoing. Features will be updated as the project progresses.
+**Repository:** https://github.com/nishanty23/fixnear-service-booking
 
-## Team Collaboration
+---
 
-This project is developed collaboratively using Git and GitHub.
-
-- `main` is the protected stable branch.
-- Developers should work on separate feature branches.
-- Changes should be submitted through Pull Requests.
-- Changes should be reviewed before merging into `main`.
-
-## Future Improvements
-
-- React-based user interface.
-- Location-based provider discovery.
-- Provider availability and scheduling improvements.
-- Booking notifications.
-- Admin dashboard.
+*Developed as an academic full-stack web development project.*
