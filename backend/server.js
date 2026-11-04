@@ -13,6 +13,9 @@ const serviceRoutes = require("./routes/serviceRoutes");
 const requestRoutes = require("./routes/requestRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 
+// user routes
+const userRoutes = require("./routes/userRoutes/UserRoutes")
+
 const app = express();
 
 // Middleware
@@ -34,7 +37,7 @@ app.use("/api/providers", providerRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/reviews", reviewRoutes);
-
+app.use("/api/user", userRoutes)
 const PORT = process.env.PORT || 5000;
 
 // Start server
