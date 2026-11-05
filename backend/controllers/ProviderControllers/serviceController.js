@@ -1,9 +1,9 @@
 
 const mongoose = require("mongoose");
 
-const Service = require("../models/Service");
-const ServiceProvider = require("../models/ServiceProvider");
-const ServiceCategory = require("../models/ServiceCategory");
+const Service = require("../../models/Service");
+const ServiceProvider = require("../../models/ServiceProvider");
+const ServiceCategory = require("../../models/ServiceCategory");
 
 // HELPER FUNCTIONS
 

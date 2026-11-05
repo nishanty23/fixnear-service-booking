@@ -6,7 +6,7 @@ const {
   createCategory,
   updateCategory,
   deleteCategory
-} = require("../controllers/categoryController");
+} = require("../controllers/ProviderControllers/categoryController");
 
 const {
   authenticateUser,
