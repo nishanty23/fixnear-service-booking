@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const ServiceRequest = require("../models/ServiceRequest");
@@ -164,7 +163,8 @@ const createRequest = async (req, res) => {
 const getMyRequests = async (req, res) => {
   try {
     const requests = await ServiceRequest.find({
-      user: req.user._id
+      user: req.user._id,
+      hiddenFromHistory: { $ne: true }
     })
       .populate("service", "name price priceType")
       .populate({
@@ -317,6 +317,51 @@ const updateRequestStatus = async (req, res) => {
   }
 };
 
+
+// HIDE COMPLETED/CANCELLED REQUEST FROM CUSTOMER HISTORY
+const hideRequestFromHistory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid request ID"
+      });
+    }
+
+    const request = await ServiceRequest.findOneAndUpdate(
+      {
+        _id: id,
+        user: req.user._id,
+        status: { $in: ["COMPLETED", "CANCELLED"] },
+        hiddenFromHistory: { $ne: true }
+      },
+      {
+        $set: { hiddenFromHistory: true }
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!request) {
+      return res.status(409).json({
+        success: false,
+        message: "Only your completed or cancelled bookings can be removed from history"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Booking removed from your history"
+    });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
 // CANCEL SERVICE REQUEST (USER)
 
 const cancelRequest = async (req, res) => {
@@ -372,5 +417,6 @@ module.exports = {
   getMyRequests,
   getProviderRequests,
   updateRequestStatus,
-  cancelRequest
+  cancelRequest,
+  hideRequestFromHistory
 };
