@@ -1,4 +1,3 @@
-
 const express = require("express");
 
 const {
@@ -19,14 +18,15 @@ const router = express.Router();
 router.get("/", getProviders);
 router.get("/:id", getProviderById);
 
-// Service provider-only routes
+// USER can submit provider application
 router.post(
   "/profile",
   authenticateUser,
-  authorizeRoles("SERVICE_PROVIDER"),
+  authorizeRoles("USER"),
   createProviderProfile
 );
 
+// Only approved SERVICE_PROVIDER can update profile
 router.put(
   "/profile",
   authenticateUser,
