@@ -1,3 +1,4 @@
+
 const express = require("express");
 
 const {
@@ -7,7 +8,7 @@ const {
   updateRequestStatus,
   cancelRequest,
   hideRequestFromHistory
-} = require("../controllers/requestController");
+} = require("../controllers/ProviderControllers/requestController");
 
 const {
   authenticateUser,

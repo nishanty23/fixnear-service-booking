@@ -1,7 +1,7 @@
 
 const mongoose = require("mongoose");
-const ServiceCategory = require("../models/ServiceCategory");
-const Service = require("../models/Service");
+const ServiceCategory = require("../../models/ServiceCategory");
+const Service = require("../../models/Service");
 
 // GET ALL CATEGORIES
 const getCategories = async (req, res) => {

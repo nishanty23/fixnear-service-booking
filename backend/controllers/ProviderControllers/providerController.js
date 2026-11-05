@@ -1,6 +1,6 @@
 
 const mongoose = require("mongoose");
-const ServiceProvider = require("../models/ServiceProvider");
+const ServiceProvider = require("../../models/ServiceProvider");
 
 // HELPER: ESCAPE REGULAR EXPRESSIONS
 const escapeRegex = (value) => {

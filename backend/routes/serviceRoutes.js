@@ -7,7 +7,7 @@ const {
   createService,
   updateService,
   deleteService
-} = require("../controllers/serviceController");
+} = require("../controllers/ProviderControllers/serviceController");
 
 const {
   authenticateUser,
