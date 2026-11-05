@@ -6,7 +6,8 @@ const {
   getMyRequests,
   getProviderRequests,
   updateRequestStatus,
-  cancelRequest
+  cancelRequest,
+  hideRequestFromHistory
 } = require("../controllers/ProviderControllers/requestController");
 
 const {
@@ -29,6 +30,13 @@ router.get(
   authenticateUser,
   authorizeRoles("USER"),
   getMyRequests
+);
+
+router.put(
+  "/:id/hide",
+  authenticateUser,
+  authorizeRoles("USER"),
+  hideRequestFromHistory
 );
 
 router.put(
