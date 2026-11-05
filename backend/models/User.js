@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["USER", "SERVICE_PROVIDER", "ADMIN"],
       default: "USER"
+    },
+
+    // Account Active / Deactivated Status
+    isActive: {
+      type: Boolean,
+      default: true
     }
   },
   {

@@ -73,6 +73,17 @@ const serviceProviderSchema = new mongoose.Schema(
       default: 0,
       min: 0,
       max: 5
+    },
+    approvalStatus: {
+      type: String,
+      enum: ["PENDING", "APPROVED", "REJECTED"],
+      default: "PENDING"
+    },
+
+    rejectionReason: {
+      type: String,
+      trim: true,
+      default: null
     }
   },
   {
