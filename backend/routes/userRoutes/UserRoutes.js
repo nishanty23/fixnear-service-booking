@@ -1,5 +1,7 @@
 
 const express = require("express");
+const userRouter = express.Router();
+
 const {
     getCategory,
     searchServices,
@@ -12,7 +14,6 @@ const {
     authorizeRoles
 } = require("../../middleware/authMiddleware");
 
-const userRouter = express.Router();
 
 userRouter.use(authenticateUser, authorizeRoles("USER"));
 

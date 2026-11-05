@@ -31,15 +31,13 @@ const register = async (req, res) => {
             });
         }
 
-        const assignedRole = "USER";
-
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
             name: name.trim(),
             email: normalizedEmail,
             password: hashedPassword,
-            role: assignedRole
+            role: role
         });
 
         res.status(201).json({
