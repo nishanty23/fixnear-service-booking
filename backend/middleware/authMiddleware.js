@@ -1,4 +1,3 @@
-
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
@@ -51,6 +50,14 @@ const authenticateUser = async (req, res, next) => {
             return res.status(401).json({
                 success: false,
                 message: "User no longer exists"
+            });
+        }
+
+        // CHECK ACCOUNT STATUS
+        if (user.isActive === false) {
+            return res.status(403).json({
+                success: false,
+                message: "Your account has been deactivated. Please contact Admin."
             });
         }
 

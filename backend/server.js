@@ -13,6 +13,12 @@ const serviceRoutes = require("./routes/serviceRoutes");
 const requestRoutes = require("./routes/requestRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 
+//admin Routes imports
+const adminAuthRoutes = require("./routes/adminRoutes/adminAuthRoutes");
+const dashboardRoutes = require("./routes/adminRoutes/dashboardRoutes");
+const userRoutes = require("./routes/adminRoutes/userRoutes");
+const adminProviderRoutes = require("./routes/adminRoutes/providerRoutes");
+
 const app = express();
 
 // Middleware
@@ -34,6 +40,12 @@ app.use("/api/providers", providerRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/reviews", reviewRoutes);
+
+//Admin API routes
+app.use("/api/admin/auth", adminAuthRoutes);
+app.use("/api/admin/dashboard", dashboardRoutes);
+app.use("/api/admin/users", userRoutes);
+app.use("/api/admin/providers", adminProviderRoutes);
 
 const PORT = process.env.PORT || 5000;
 

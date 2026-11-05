@@ -20,6 +20,6 @@ router.post("/login", login);
 
 router.get("/me", authenticateUser, getProfile);
 
-router.put("update-profile", authenticateUser, updateProfile);
+router.put("/update-profile", authenticateUser, updateProfile);
 
 module.exports = router;
