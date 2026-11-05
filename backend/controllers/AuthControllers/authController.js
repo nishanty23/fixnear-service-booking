@@ -4,7 +4,7 @@ const User = require("../../models/User");
 
 const register = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, role } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({
@@ -31,15 +31,13 @@ const register = async (req, res) => {
             });
         }
 
-        const assignedRole = "USER";
-
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
             name: name.trim(),
             email: normalizedEmail,
             password: hashedPassword,
-            role: assignedRole
+            role: role
         });
 
         res.status(201).json({

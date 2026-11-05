@@ -13,10 +13,15 @@ const serviceRoutes = require("./routes/serviceRoutes");
 const requestRoutes = require("./routes/requestRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 
+// User routes Imports
+const userRouter = require("./routes/userRoutes/UserRoutes");
+const userBookingRouter = require("./routes/userRoutes/userBookingRoutes");
+
+
 //admin Routes imports
 const adminAuthRoutes = require("./routes/adminRoutes/adminAuthRoutes");
 const dashboardRoutes = require("./routes/adminRoutes/dashboardRoutes");
-const userRoutes = require("./routes/adminRoutes/userRoutes");
+const adminUserRoutes = require("./routes/adminRoutes/userRoutes");
 const adminProviderRoutes = require("./routes/adminRoutes/providerRoutes");
 
 const app = express();
@@ -41,10 +46,14 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/reviews", reviewRoutes);
 
+// User API routes
+app.use("/api/user", userRouter);
+app.use("/api/user/booking", userBookingRouter);
+
 //Admin API routes
 app.use("/api/admin/auth", adminAuthRoutes);
 app.use("/api/admin/dashboard", dashboardRoutes);
-app.use("/api/admin/users", userRoutes);
+app.use("/api/admin/users", adminUserRoutes);
 app.use("/api/admin/providers", adminProviderRoutes);
 
 const PORT = process.env.PORT || 5000;
