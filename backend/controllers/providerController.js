@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 const ServiceProvider = require("../models/ServiceProvider");
 
@@ -255,12 +254,14 @@ const createProviderProfile = async (req, res) => {
       pincode,
       latitude,
       longitude,
-      experience
+      experience,
+      approvalStatus: "PENDING",
+      rejectionReason: null
     });
 
     res.status(201).json({
       success: true,
-      message: "Provider profile created successfully",
+      message: "Provider application submitted successfully. Waiting for Admin approval.",
       provider
     });
 
@@ -417,7 +418,7 @@ const updateProviderProfile = async (req, res) => {
 
     if (
       (updates.latitude !== undefined ||
-       updates.longitude !== undefined) &&
+        updates.longitude !== undefined) &&
       !validateCoordinates(newLatitude, newLongitude)
     ) {
       return res.status(400).json({

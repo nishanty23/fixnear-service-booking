@@ -1,4 +1,3 @@
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
@@ -78,6 +77,14 @@ const login = async (req, res) => {
         if (!user) {
             return res.status(401).json({
                 message: "Invalid email or password"
+            });
+        }
+
+        // CHECK USER ACCOUNT STATUS
+        if (user.isActive === false) {
+            return res.status(403).json({
+                success: false,
+                message: "Your account has been deactivated. Please contact Admin."
             });
         }
 
