@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const serviceRequestSchema = new mongoose.Schema(
@@ -73,6 +72,11 @@ const serviceRequestSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0
+    },
+
+    hiddenFromHistory: {
+      type: Boolean,
+      default: false
     }
   },
   {

@@ -1,4 +1,3 @@
-
 const express = require("express");
 
 const {
@@ -6,7 +5,8 @@ const {
   getMyRequests,
   getProviderRequests,
   updateRequestStatus,
-  cancelRequest
+  cancelRequest,
+  hideRequestFromHistory
 } = require("../controllers/requestController");
 
 const {
@@ -29,6 +29,13 @@ router.get(
   authenticateUser,
   authorizeRoles("USER"),
   getMyRequests
+);
+
+router.put(
+  "/:id/hide",
+  authenticateUser,
+  authorizeRoles("USER"),
+  hideRequestFromHistory
 );
 
 router.put(

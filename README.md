@@ -9,9 +9,11 @@ Service providers can manage their profiles, list services and handle customer b
 ### Customer
 - Register and log in securely.
 - Browse available service categories and services.
+- Search services by name, description or category and sort by price.
 - Explore service providers and their pricing.
 - Book services by providing appointment and address details.
 - View booking history and request status.
+- Hide completed or cancelled bookings from personal history without deleting the underlying records.
 - Cancel eligible bookings.
 - Submit ratings and reviews for completed services.
 
@@ -147,6 +149,8 @@ All API endpoints are prefixed with:
 | GET | `/requests/provider` | Get provider bookings |
 | PUT | `/requests/:id/status` | Update booking status |
 | PUT | `/requests/:id/cancel` | Cancel eligible booking |
+| PUT | `/requests/:id/hide` | Hide a completed/cancelled booking from the customer's history |
+| PUT | `/requests/:id/hide` | Hide a completed/cancelled booking from the customer's history |
 
 ### Reviews
 
@@ -227,12 +231,25 @@ Open the frontend URL in your browser and register or log in to use FixNear.
 - Duplicate reviews for the same service request are prevented.
 - Categories referenced by services cannot be deleted.
 
+## Additional Frontend Pages
+
+- Home page with service search, category filters, price sorting and service cards.
+- How It Works page explaining the booking lifecycle.
+- FAQ page with common customer and provider questions.
+- Customer and provider dashboards with booking summary statistics.
+
+## Additional Frontend Pages
+
+- Home page with service search, category filters, price sorting and service cards.
+- How It Works page explaining the booking lifecycle.
+- FAQ page with common customer and provider questions.
+- Customer and provider dashboards with booking summary statistics.
+
 ## Future Enhancements
 
 - Online payment integration.
 - Real-time booking notifications.
 - Interactive provider location maps.
-- Advanced service search and filters.
 - Provider availability calendar.
 - Email and SMS notifications.
 - Deployment to a cloud hosting platform.
