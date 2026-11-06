@@ -17,4 +17,4 @@ reviewRouter.post("/", authenticateUser, createReview);
 reviewRouter.get("/my", authenticateUser, getMyReviews);
 reviewRouter.delete("/:id", authenticateUser, deleteReview);
 
-module.exports = router;
+module.exports = reviewRouter;
