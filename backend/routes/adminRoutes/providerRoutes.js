@@ -3,7 +3,11 @@ const express = require("express");
 const {
     getAllProviderApplications,
     getProviderApplicationById,
-    approveProviderApplication
+    approveProviderApplication,
+    rejectProviderApplication,
+    getAllApprovedProviders,
+    getApprovedProviderById,
+    updateProviderStatus
 } = require("../../controllers/adminControllers/providerController");
 
 const authenticateAdmin = require("../../middleware/adminMiddleware/adminAuthMiddleware");
@@ -15,6 +19,20 @@ router.get(
     "/",
     authenticateAdmin,
     getAllProviderApplications
+);
+
+// Get all approved providers
+router.get(
+    "/approved",
+    authenticateAdmin,
+    getAllApprovedProviders
+);
+
+// Get approved provider by ID
+router.get(
+    "/approved/:id",
+    authenticateAdmin,
+    getApprovedProviderById
 );
 
 // Get provider application by ID
@@ -30,5 +48,15 @@ router.put(
     authenticateAdmin,
     approveProviderApplication
 );
+
+// Reject provider application
+router.put(
+    "/:id/reject",
+    authenticateAdmin,
+    rejectProviderApplication
+);
+
+// ACTIVATE / DEACTIVATE PROVIDER
+router.put("/:id/status", authenticateAdmin, updateProviderStatus);
 
 module.exports = router;
