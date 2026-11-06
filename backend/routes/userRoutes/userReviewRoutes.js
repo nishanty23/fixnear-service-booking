@@ -8,7 +8,7 @@ const {
   deleteReview
 } = require("../../controllers/UserControllers/userReviewController");
 
-const { authenticateUser } = require("../middleware/authMiddleware");
+const { authenticateUser } = require("../../middleware/authMiddleware");
 
 // Public
 reviewRouter.get("/service/:serviceId", getServiceReviews);
