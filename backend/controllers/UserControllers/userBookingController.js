@@ -95,6 +95,129 @@ const getBookingHistory = async (req, res) => {
     }
 }
 
+// Get booking by Id
+const getBookingById = async (req, res) => {
+    try {
+
+        const {id} = req.params;
+
+        if(!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid booking ID"
+            })
+        }
+
+        const booking = await ServiceRequest.findById({ _id: id})
+            .populate({
+                path: "service", 
+                select: "name description price priceType"})
+            .populate({
+                path: "provider", 
+                select: "businessName phone city area averageRating",
+                populate: {
+                    path: "user",
+                    select: "name email"
+                }
+            });
+        if(!booking) {
+            res.status(404).json({
+                success: false,
+                message: "Booking not found"
+            });
+        }
+
+        if(booking.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            booking
+        })
+         
+    }
+    catch(error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal error"
+        })
+    }
+}
+
+// Reschedule booking
+const rescheduleBooking = async (req, res) => {
+    try{
+
+        const { id } = req.params;
+        const { scheduleDate } = req.body;
+
+        if(!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid booking Id"
+            })
+        }
+
+        if(!scheduleDate) {
+            return res.status(400).json({
+                success: false,
+                message: "New date required"
+            })
+        }
+
+        const newDate = new Date(scheduleDate);
+        // Check if the date is valid and if the date is > today
+        if(isNaN(newDate.getTime()) || newDate <= new Date() ) {
+            return res.status(400).json({
+                success: false,
+                message: "New date must be a valid future date"
+            });
+        }
+
+        const booking = await ServiceRequest.findById(id);
+
+        if(!booking) {
+            return res.status(404).json({
+                success: false,
+                message: "Booking not found"
+            })
+        }
+
+        // Checking if the booking belongs to the logged in user
+        // Check the userId in serviceRequest collection with the userId from the request
+        if(booking.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "Access Denied"
+            });
+        }
+
+        const lockedStatuses = ["IN_PROGRESS", "COMPLETED", "CANCELLED", "REJECTED"];
+        if(lockedStatuses.includes(booking.status)) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot reschedule booking with status ${booking.status}`
+            });
+        }
+
+        booking.scheduledDate = newDate;
+        await booking.save();
+
+    }
+    catch(error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal error occured"
+        })
+    }
+}
+
 // Cancel pending booking
 const cancelBooking = async (req, res) => {
     try{
@@ -141,5 +264,7 @@ const cancelBooking = async (req, res) => {
 module.exports = {
     createBooking,
     getBookingHistory,
+    getBookingById,
+    rescheduleBooking,
     cancelBooking
 }

@@ -16,6 +16,7 @@ const reviewRoutes = require("./routes/reviewRoutes");
 // User routes Imports
 const userRouter = require("./routes/userRoutes/UserRoutes");
 const userBookingRouter = require("./routes/userRoutes/userBookingRoutes");
+const userReviewRouter = require("./routes/userRoutes/userReviewRoutes");
 
 
 //admin Routes imports
@@ -51,6 +52,7 @@ app.use("/api/reviews", reviewRoutes);
 // User API routes
 app.use("/api/user", userRouter);
 app.use("/api/user/booking", userBookingRouter);
+app.use("/api/user/review", userReviewRouter);
 
 //Admin API routes
 app.use("/api/admin/auth", adminAuthRoutes);
