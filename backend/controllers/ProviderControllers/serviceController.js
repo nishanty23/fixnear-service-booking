@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const Service = require("../../models/Service");
@@ -104,10 +103,10 @@ const getServices = async (req, res) => {
     }
 
     const services = await Service.find(filter)
-      .populate("category", "name")
       .populate({
         path: "provider",
         match: {
+          approvalStatus: "APPROVED",
           availability: true,
           ...(city
             ? { city: { $regex: escapeRegex(city.trim()), $options: "i" } }
@@ -118,13 +117,18 @@ const getServices = async (req, res) => {
         },
         populate: {
           path: "user",
+          match: {
+            isActive: { $ne: false }
+          },
           select: "name"
         }
       })
       .sort({ price: 1 });
 
     const availableServices = services.filter(
-      service => service.provider !== null
+      service =>
+        service.provider !== null &&
+        service.provider.user !== null
     );
 
     res.status(200).json({
@@ -157,13 +161,26 @@ const getServiceById = async (req, res) => {
       .populate("category", "name")
       .populate({
         path: "provider",
+        match: {
+          approvalStatus: "APPROVED",
+          availability: true
+        },
         populate: {
           path: "user",
+          match: {
+            isActive: { $ne: false }
+          },
           select: "name"
         }
       });
 
-    if (!service || !service.provider || !service.provider.availability) {
+    if (
+      !service ||
+      !service.provider ||
+      service.provider.approvalStatus !== "APPROVED" ||
+      service.provider.availability !== true ||
+      !service.provider.user
+    ) {
       return res.status(404).json({
         success: false,
         message: "Service not found or provider unavailable"
@@ -254,6 +271,22 @@ const createService = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Please create your provider profile first"
+      });
+    }
+
+    // Check provider approval
+    if (provider.approvalStatus !== "APPROVED") {
+      return res.status(403).json({
+        success: false,
+        message: "Your provider account is not approved yet"
+      });
+    }
+
+    // Check provider availability
+    if (provider.availability !== true) {
+      return res.status(403).json({
+        success: false,
+        message: "Your provider account is currently unavailable"
       });
     }
 
@@ -399,10 +432,27 @@ const updateService = async (req, res) => {
       user: req.user._id
     });
 
+    // First check whether provider exists
     if (!provider) {
       return res.status(404).json({
         success: false,
         message: "Provider profile not found"
+      });
+    }
+
+    // Check provider approval
+    if (provider.approvalStatus !== "APPROVED") {
+      return res.status(403).json({
+        success: false,
+        message: "Your provider account is not approved yet"
+      });
+    }
+
+    // Check provider availability
+    if (provider.availability !== true) {
+      return res.status(403).json({
+        success: false,
+        message: "Your provider account is currently unavailable"
       });
     }
 
@@ -455,10 +505,27 @@ const deleteService = async (req, res) => {
       user: req.user._id
     });
 
+    // First check whether provider exists
     if (!provider) {
       return res.status(404).json({
         success: false,
         message: "Provider profile not found"
+      });
+    }
+
+    // Check provider approval
+    if (provider.approvalStatus !== "APPROVED") {
+      return res.status(403).json({
+        success: false,
+        message: "Your provider account is not approved yet"
+      });
+    }
+
+    // Check provider availability
+    if (provider.availability !== true) {
+      return res.status(403).json({
+        success: false,
+        message: "Your provider account is currently unavailable"
       });
     }
 

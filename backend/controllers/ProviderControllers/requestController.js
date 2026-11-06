@@ -113,10 +113,18 @@ const createRequest = async (req, res) => {
 
     const provider = await ServiceProvider.findOne({
       _id: serviceDetails.provider,
+      approvalStatus: "APPROVED",
       availability: true
+    }).populate({
+      path: "user",
+      select: "isActive"
     });
 
-    if (!provider) {
+    if (
+      !provider ||
+      !provider.user ||
+      provider.user.isActive === false
+    ) {
       return res.status(400).json({
         success: false,
         message: "Service provider is currently unavailable"
