@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import { loginUser, registerUser } from "./services/authService";
 import { getCategories, getServices } from "./services/catalogService";
 import {
@@ -16,7 +16,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Bookings from "./pages/Bookings";
 import ProviderDashboard from "./pages/ProviderDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+import OldAdminDashboard from "./pages/AdminDashboard";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import HowItWorks from "./pages/HowItWorks";
@@ -24,6 +24,15 @@ import FAQ from "./pages/FAQ";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import MessageAlert from "./components/MessageAlert";
+
+//admin imports
+import AdminLogin from "./adminFrontend/pages/AdminLogin";
+import AdminLayout from "./adminFrontend/layouts/AdminLayout";
+import AdminDashboard from "./adminFrontend/pages/AdminDashboard";
+import ManageUsers from "./adminFrontend/pages/ManageUsers";
+import ManageProviders from "./adminFrontend/pages/ManageProviders";
+import ManageServices from "./adminFrontend/pages/ManageServices";
+import ManageBookings from "./adminFrontend/pages/ManageBookings";
 
 
 function AppContent() {
@@ -37,6 +46,10 @@ function AppContent() {
     const [message, setMessage] = useState("");
 
     const navigate = useNavigate();
+
+    const location = useLocation();
+
+    const isAdminRoute = location.pathname.startsWith("/admin");
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -163,7 +176,9 @@ function AppContent() {
 
     return (
         <>
-            <Navbar user={user} logout={logout} />
+            {!isAdminRoute && (
+                <Navbar user={user} logout={logout} />
+            )}
 
             <MessageAlert
                 message={message}
@@ -212,11 +227,38 @@ function AppContent() {
                 <Route path="/faq" element={<FAQ />} />
 
                 <Route path="/admin" element={
-                    <AdminDashboard user={user} />
+                    <OldAdminDashboard user={user} />
                 } />
+
+                <Route path="/admin/login" element={
+                    <AdminLogin />
+                } />
+
+                <Route path="/admin" element={<AdminLayout />}>
+                    <Route
+                        path="dashboard"
+                        element={<AdminDashboard />}
+                    />
+                    <Route
+                        path="users"
+                        element={<ManageUsers />}
+                    />
+                    <Route
+                        path="providers"
+                        element={<ManageProviders />}
+                    />
+                    <Route
+                        path="services"
+                        element={<ManageServices />}
+                    />
+                    <Route
+                        path="bookings"
+                        element={<ManageBookings />}
+                    />
+                </Route>
             </Routes>
 
-            <Footer />
+            {!isAdminRoute && <Footer />}
         </>
     );
 }
