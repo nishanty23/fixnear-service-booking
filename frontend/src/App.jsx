@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import "./App.css";
 import NavBar from "./components/AppLayout/NavBar/NavBar.jsx";
 import HomePage from "./pages/User/HomePage/HomePage.jsx";
 import { LocationProvider } from "./context/LocationContext.jsx";
@@ -6,7 +7,6 @@ import Login from "./pages/Login/Login.jsx";
 import Register from "./pages/Register/Register.jsx";
 import Bookings from "./pages/Bookings.jsx";
 import Services from "./pages/Services.jsx";
-
 import AdminLogin from "./adminFrontend/pages/AdminLogin.jsx";
 import AdminLayout from "./adminFrontend/layouts/AdminLayout.jsx";
 import AdminDashboard from "./adminFrontend/pages/AdminDashboard.jsx";
@@ -14,7 +14,6 @@ import ManageUsers from "./adminFrontend/pages/ManageUsers.jsx";
 import ManageProviders from "./adminFrontend/pages/ManageProviders.jsx";
 import ManageServices from "./adminFrontend/pages/ManageServices.jsx";
 import ManageBookings from "./adminFrontend/pages/ManageBookings.jsx";
-
 function AppContent() {
     const { pathname } = useLocation();
     const isAdminRoute = pathname.startsWith("/admin");
