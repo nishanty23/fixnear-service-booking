@@ -536,8 +536,8 @@ button {
 }
 
 .status.accepted, .status.in_progress {
-    background: #e2efff;
-    color: #2861a1;
+    background: #e0f4e5;
+    color: #247344;
 }
 
 .status.completed {

@@ -6,7 +6,8 @@ const {
     getCategory,
     searchServices,
     getServiceDetails,
-    getProviderDetails
+    getProviderDetails,
+    getNearbyCategories
 } = require("../../controllers/UserControllers/userServiceController");
 
 const {
@@ -15,10 +16,13 @@ const {
 } = require("../../middleware/authMiddleware");
 
 
+// Nearby categories are public because location discovery does not require login.
+userRouter.get("/categories/nearby", getNearbyCategories);
+userRouter.get("/search", searchServices);
+
 userRouter.use(authenticateUser, authorizeRoles("USER"));
 
 userRouter.get("/categories", getCategory);
-userRouter.get("/search", searchServices);
 userRouter.get("/:id", getServiceDetails);
 userRouter.get("/provider/:id", getProviderDetails);
 

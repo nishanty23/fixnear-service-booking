@@ -28,6 +28,31 @@ const validateCoordinates = (latitude, longitude) => {
   );
 };
 
+// Validate the GeoJSON Point used for nearby-provider searches.
+const validateLocation = (location) => {
+  if (
+    !location ||
+    location.type !== "Point" ||
+    !Array.isArray(location.coordinates) ||
+    location.coordinates.length !== 2
+  ) {
+    return false;
+  }
+
+  const [longitude, latitude] = location.coordinates;
+
+  return (
+    typeof longitude === "number" &&
+    typeof latitude === "number" &&
+    Number.isFinite(longitude) &&
+    Number.isFinite(latitude) &&
+    longitude >= -180 &&
+    longitude <= 180 &&
+    latitude >= -90 &&
+    latitude <= 90
+  );
+};
+
 // HELPER: VALIDATE PHONE NUMBER
 const isValidPhone = (phone) => {
   return (
@@ -163,6 +188,7 @@ const createProviderProfile = async (req, res) => {
       pincode,
       latitude,
       longitude,
+      location,
       experience
     } = req.body;
 
@@ -211,10 +237,21 @@ const createProviderProfile = async (req, res) => {
       });
     }
 
-    if (!validateCoordinates(latitude, longitude)) {
+    // Accept either a GeoJSON location or legacy latitude/longitude input.
+    const providerLocation = location || (
+      latitude !== undefined && longitude !== undefined
+        ? {
+            type: "Point",
+            // MongoDB GeoJSON coordinates must be [longitude, latitude].
+            coordinates: [longitude, latitude]
+          }
+        : undefined
+    );
+
+    if (!validateLocation(providerLocation)) {
       return res.status(400).json({
         success: false,
-        message: "Provide valid latitude and longitude together"
+        message: "A valid location with longitude and latitude is required"
       });
     }
 
@@ -252,8 +289,8 @@ const createProviderProfile = async (req, res) => {
       area: area.trim(),
       address: address?.trim(),
       pincode,
-      latitude,
-      longitude,
+      // Persist the provider's point so MongoDB can perform nearby searches.
+      location: providerLocation,
       experience,
       approvalStatus: "PENDING",
       rejectionReason: null
