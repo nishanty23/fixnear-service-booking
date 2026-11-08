@@ -27,14 +27,126 @@ const getCategory = async (request, response) => {
     }
 };
 
+// Get nearby categories
+const getNearbyCategories = async(req, res) => {
+    try {
+
+        const latitude = Number(req.query.latitude);
+        const longitude = Number(req.query.longitude);
+        const radiusKm = Number(req.query.radiusKm || 10);
+        
+        if(
+         !Number.isFinite(latitude) ||
+         !Number.isFinite(longitude) ||
+         latitude < -90 ||
+         latitude > 90 ||
+         longitude < -180 ||
+         longitude > 180) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid latitude and longitude required"
+            })
+         }
+        if (!Number.isFinite(radiusKm) || radiusKm <= 0 || radiusKm > 100) {
+            return res.status(400).json({
+                success: false,
+                message: "Radius must be between 1 and 100 km"
+            });
+        }
+
+        const categories = await ServiceProvider.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: "Point",
+            coordinates: [longitude, latitude]
+          },
+          distanceField: "distanceMeters",
+          maxDistance: radiusKm * 1000,
+          spherical: true,
+          query: {
+            approvalStatus: "APPROVED",
+            availability: true
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "services",
+          localField: "_id",
+          foreignField: "provider",
+          as: "services"
+        }
+      },
+      { $unwind: "$services" },
+      {
+        $match: {
+          "services.isActive": true
+        }
+      },
+      {
+        $lookup: {
+          from: "servicecategories",
+          localField: "services.category",
+          foreignField: "_id",
+          as: "category"
+        }
+      },
+      { $unwind: "$category" },
+      {
+        $group: {
+          _id: "$category._id",
+          name: { $first: "$category.name" },
+          description: { $first: "$category.description" }
+        }
+      },
+      { $sort: { name: 1 } }
+    ]);
+
+    return res.status(200).json({
+        success: true,
+        count: categories.length,
+        categories
+    })
+
+    }
+    catch(error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal error"
+        })
+    }
+}
+
 // Services with filters: cat_Id, city, area etc
 const searchServices = async (request, response) => {
     try {
         
-        const {category, city, area, minPrice, maxPrice} = request.query;
+        const { search, category, city, area, minPrice, maxPrice} = request.query;
         const filters = {
             isActive: true
         };
+
+        if (search !== undefined) {
+            if (typeof search !== "string" || !search.trim()) {
+                return response.status(400).json({
+                    success: false,
+                    message: "Search term cannot be empty"
+                });
+            }
+
+            const escapedSearch = search.trim().replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&"
+            );
+            const searchRegex = new RegExp(escapedSearch, "i");
+
+            filters.$or = [
+                { name: searchRegex },
+                { description: searchRegex }
+            ];
+        }
         // Object to store the filters
         
         if(category) {
@@ -191,6 +303,7 @@ const getProviderDetails = async (request, response) => {
 
 module.exports = {
     getCategory,
+    getNearbyCategories,
     searchServices,
     getServiceDetails,
     getProviderDetails

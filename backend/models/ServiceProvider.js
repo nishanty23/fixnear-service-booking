@@ -8,66 +8,63 @@ const serviceProviderSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
-
     businessName: {
       type: String,
       required: true,
       trim: true
     },
-
     description: {
       type: String,
       required: true,
       trim: true
     },
-
     phone: {
       type: String,
       required: true,
       trim: true
     },
-
     city: {
       type: String,
       required: true,
       trim: true
     },
-
     area: {
       type: String,
       required: true,
       trim: true
     },
-
     address: {
       type: String,
       trim: true
     },
-
     pincode: {
       type: String,
       required: true,
       trim: true
     },
 
-    latitude: {
-      type: Number
-    },
-
-    longitude: {
-      type: Number
+    // Replaced flat lat/lng with MongoDB GeoJSON Point structure
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+        default: "Point"
+      },
+      coordinates: {
+        type: [Number], // Must always be [longitude, latitude]
+        required: true
+      }
     },
 
     experience: {
       type: Number,
       default: 0
     },
-
     availability: {
       type: Boolean,
       default: true
     },
-
     averageRating: {
       type: Number,
       default: 0,
@@ -79,7 +76,6 @@ const serviceProviderSchema = new mongoose.Schema(
       enum: ["PENDING", "APPROVED", "REJECTED"],
       default: "PENDING"
     },
-
     rejectionReason: {
       type: String,
       trim: true,
@@ -90,5 +86,8 @@ const serviceProviderSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+
+serviceProviderSchema.index({ location: "2dsphere" });
 
 module.exports = mongoose.model("ServiceProvider", serviceProviderSchema);
