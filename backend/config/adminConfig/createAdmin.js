@@ -1,5 +1,12 @@
 
-require("dotenv").config();
+const path = require("path");
+
+require("dotenv").config({
+    path: path.resolve(__dirname, "../../.env")
+});
+console.log("Admin name:", process.env.ADMIN_NAME);
+console.log("Admin email:", process.env.ADMIN_EMAIL);
+console.log("Password loaded:", !!process.env.ADMIN_PASSWORD);
 
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");

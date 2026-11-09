@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerProvider, loginProvider } from "../services/authService";
-import { createProviderProfile } from "../services/providerService";
+import { registerProvider } from "../services/authService";
 import { getCategories } from "../services/catalogService";
 import LocationAutocomplete from "../components/AppLayout/LocationAutoComplete/LocationAutoComplete.jsx";
 
@@ -41,21 +40,10 @@ export default function BecomeProvider() {
         const form = new FormData(event.currentTarget);
 
         try {
-            await registerProvider(
-                form.get("name"),
-                form.get("email"),
-                form.get("password")
-            );
-
-            const loginResponse = await loginProvider(
-                form.get("email"),
-                form.get("password")
-            );
-            localStorage.setItem("token", loginResponse.data.token);
-            localStorage.setItem("user", JSON.stringify(loginResponse.data.user));
-            window.dispatchEvent(new Event("fixnear-auth-change"));
-
-            await createProviderProfile({
+            await registerProvider({
+                name: form.get("name"),
+                email: form.get("email"),
+                password: form.get("password"),
                 businessName: form.get("businessName"),
                 category: form.get("category"),
                 description: form.get("description"),
@@ -71,7 +59,12 @@ export default function BecomeProvider() {
                 }
             });
 
-            navigate("/provider/dashboard", { replace: true });
+            navigate("/provider/login", {
+                replace: true,
+                state: {
+                    message: "Registration submitted. Please wait for admin approval before logging in."
+                }
+            });
         } catch (requestError) {
             setError(
                 requestError.response?.data?.message ||

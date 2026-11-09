@@ -1,6 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const User = require("../../models/User");
+const ServiceProvider = require("../../models/ServiceProvider");
+const ServiceCategory = require("../../models/ServiceCategory");
 
 const register = async (req, res) => {
     try {
@@ -95,6 +98,17 @@ const login = async (req, res) => {
             });
         }
 
+        if (req.providerLogin) {
+            const provider = await ServiceProvider.findOne({ user: user._id });
+
+            if (!provider || provider.approvalStatus !== "APPROVED") {
+                return res.status(403).json({
+                    success: false,
+                    message: "Your provider account is awaiting admin approval."
+                });
+            }
+        }
+
         // CHECK USER ACCOUNT STATUS
         if (user.isActive === false) {
             return res.status(403).json({
@@ -145,9 +159,118 @@ const login = async (req, res) => {
     }
 };
 
-const registerProvider = (req, res) => {
-    req.providerRegistration = true;
-    return register(req, res);
+const registerProvider = async (req, res) => {
+    try {
+        const {
+            name,
+            email,
+            password,
+            businessName,
+            category,
+            description,
+            phone,
+            city,
+            area,
+            address,
+            pincode,
+            experience,
+            location
+        } = req.body;
+
+        if (!name || !email || !password || !businessName || !category ||
+            !description || !phone || !city || !area || !pincode || !location) {
+            return res.status(400).json({
+                success: false,
+                message: "All provider registration fields are required"
+            });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 8 characters"
+            });
+        }
+
+        if (!mongoose.isValidObjectId(category) ||
+            !(await ServiceCategory.exists({ _id: category }))) {
+            return res.status(400).json({
+                success: false,
+                message: "A valid service category is required"
+            });
+        }
+
+        if (
+            typeof location !== "object" ||
+            location.type !== "Point" ||
+            !Array.isArray(location.coordinates) ||
+            location.coordinates.length !== 2 ||
+            !location.coordinates.every(value => Number.isFinite(value))
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "A valid provider location is required"
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const existingUser = await User.findOne({ email: normalizedEmail });
+
+        if (existingUser) {
+            return res.status(409).json({
+                success: false,
+                message: "Email already registered"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await User.create({
+            name: name.trim(),
+            email: normalizedEmail,
+            password: hashedPassword,
+            role: "SERVICE_PROVIDER"
+        });
+
+        try {
+            await ServiceProvider.create({
+                user: user._id,
+                businessName: businessName.trim(),
+                category,
+                description: description.trim(),
+                phone: phone.trim(),
+                city: city.trim(),
+                area: area.trim(),
+                address: typeof address === "string" ? address.trim() : undefined,
+                pincode: pincode.trim(),
+                experience: experience === undefined ? 0 : Number(experience),
+                location,
+                approvalStatus: "PENDING",
+                rejectionReason: null
+            });
+        } catch (profileError) {
+            await User.findByIdAndDelete(user._id);
+            throw profileError;
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: "Provider registration submitted. Please wait for admin approval."
+        });
+    } catch (error) {
+        console.error("Provider registration error:", error);
+
+        if (error.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: "Email or provider profile already registered"
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to register provider"
+        });
+    }
 };
 
 const loginProvider = (req, res) => {
