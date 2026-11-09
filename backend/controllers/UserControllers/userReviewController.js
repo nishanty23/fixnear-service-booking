@@ -4,6 +4,7 @@ const ServiceRequest = require("../../models/ServiceRequest");
 const ServiceProvider = require("../../models/ServiceProvider");
 
 // CREATE A REVIEW 
+
 const createReview = async (req, res) => {
   try {
     const { bookingId, rating, comment } = req.body;
@@ -16,15 +17,23 @@ const createReview = async (req, res) => {
     }
 
     const numericRating = Number(rating);
-    if (!numericRating || numericRating < 1 || numericRating > 5) {
+
+    if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
       return res.status(400).json({
         success: false,
         message: "Rating must be an integer between 1 and 5"
       });
     }
 
-    // 1. Verify booking existence
+    if (typeof comment !== "string" || !comment.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Review comment cannot be empty"
+      });
+    }
+
     const booking = await ServiceRequest.findById(bookingId);
+
     if (!booking) {
       return res.status(404).json({
         success: false,
@@ -32,67 +41,72 @@ const createReview = async (req, res) => {
       });
     }
 
-    // 2. Ownership check: Only the customer who booked can leave a review
     if (booking.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Access denied. You can only review your own bookings"
+        message: "You can only review your own bookings"
       });
     }
 
-    // 3. Status check: Only COMPLETED bookings can be reviewed
     if (booking.status !== "COMPLETED") {
       return res.status(400).json({
         success: false,
-        message: "You can only review a service after the booking is COMPLETED"
+        message: "Only completed bookings can be reviewed"
       });
     }
 
-    // 4. Duplicate prevention: Only one review per booking
-    const existingReview = await Review.findOne({ booking: bookingId });
+    const existingReview = await Review.findOne({
+      serviceRequest: booking._id
+    });
+
     if (existingReview) {
       return res.status(409).json({
         success: false,
-        message: "You have already submitted a review for this booking"
+        message: "You have already reviewed this booking"
       });
     }
 
-    // 5. Create review document
     const review = await Review.create({
       user: req.user._id,
       provider: booking.provider,
-      service: booking.service,
-      booking: booking._id,
-      rating: Math.floor(numericRating),
-      comment: typeof comment === "string" ? comment.trim() : ""
+      serviceRequest: booking._id,
+      rating: numericRating,
+      comment: comment.trim()
     });
 
-    // 6. Recalculate and update provider's averageRating
     const stats = await Review.aggregate([
-      { $match: { provider: booking.provider } },
+      {
+        $match: {
+          provider: booking.provider
+        }
+      },
       {
         $group: {
           _id: "$provider",
-          averageRating: { $avg: "$rating" },
-          reviewCount: { $sum: 1 }
+          averageRating: { $avg: "$rating" }
         }
       }
     ]);
 
-    if (stats.length > 0) {
-      await ServiceProvider.findByIdAndUpdate(booking.provider, {
-        averageRating: Math.round(stats[0].averageRating * 10) / 10
-      });
-    }
+    const averageRating = stats.length
+      ? Math.round(stats[0].averageRating * 10) / 10
+      : 0;
+
+    await ServiceProvider.findByIdAndUpdate(
+      booking.provider,
+      { averageRating }
+    );
 
     return res.status(201).json({
       success: true,
       message: "Review submitted successfully",
-      review
+      review,
+      averageRating
     });
 
   } catch (error) {
     console.error("Create review error:", error);
+
     return res.status(500).json({
       success: false,
       message: "Internal server error"
