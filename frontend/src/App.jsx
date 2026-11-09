@@ -5,6 +5,9 @@ import HomePage from "./pages/User/HomePage/HomePage.jsx";
 import { LocationProvider } from "./context/LocationContext.jsx";
 import Login from "./pages/Login/Login.jsx";
 import Register from "./pages/Register/Register.jsx";
+import ForgotPassword from "./pages/ForgotPassword";
+import VerifyOTP from "./pages/VerifyOTP";
+import ResetPassword from "./pages/ResetPassword";
 import Bookings from "./pages/Bookings.jsx";
 import Services from "./pages/Services.jsx";
 import ServiceDetails from "./pages/ServiceDetails.jsx";
@@ -20,11 +23,24 @@ import ManageProviders from "./adminFrontend/pages/ManageProviders.jsx";
 import ManageServices from "./adminFrontend/pages/ManageServices.jsx";
 import ManageBookings from "./adminFrontend/pages/ManageBookings.jsx";
 import ManageCategories from "./adminFrontend/pages/ManageCategories.jsx";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 function AppContent() {
     const { pathname } = useLocation();
     const isAdminRoute = pathname.startsWith("/admin");
     const isProviderAuthRoute = pathname === "/provider/login" || pathname === "/provider/register";
-    const showNavbar = !isAdminRoute && !isProviderAuthRoute && pathname !== "/login" && pathname !== "/register";
+    const hideNavbarRoutes = [
+        "/login",
+        "/register",
+        "/forgot-password",
+        "/verify-otp",
+        "/reset-password"
+    ];
+
+    const showNavbar =
+        !isAdminRoute &&
+        !isProviderAuthRoute &&
+        !hideNavbarRoutes.includes(pathname);
 
     return (
         <>
@@ -33,6 +49,11 @@ function AppContent() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/verify-otp" element={<VerifyOTP />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+
                 <Route path="/provider/login" element={<ProviderAuth mode="login" />} />
                 <Route path="/provider/register" element={<BecomeProvider />} />
                 <Route path="/provider/dashboard" element={<ProviderDashboardPage />} />
@@ -50,6 +71,8 @@ function AppContent() {
                     <Route path="bookings" element={<ManageBookings />} />
                     <Route path="categories" element={<ManageCategories />} />
                 </Route>
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
             </Routes>
         </>
     );

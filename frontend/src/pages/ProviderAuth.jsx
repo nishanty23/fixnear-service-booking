@@ -67,6 +67,16 @@ export default function ProviderAuth({ mode }) {
                 )}
                 <input name="email" type="email" required placeholder="Email address" className="mt-4 w-full rounded-lg border border-[#dce5dd] p-3" />
                 <input name="password" type="password" minLength="8" required placeholder="At least 8 characters" className="mt-4 w-full rounded-lg border border-[#dce5dd] p-3" />
+                {isLogin && (
+                    <div className="mt-3 flex justify-end">
+                        <Link
+                            to="/forgot-password"
+                            className="text-sm font-semibold text-[#247c4b] hover:underline"
+                        >
+                            Forgot Password?
+                        </Link>
+                    </div>
+                )}
                 <button disabled={loading} className="mt-6 w-full rounded-lg bg-[#247c4b] px-5 py-3 text-sm font-bold text-white disabled:bg-gray-400">
                     {loading ? "Please wait..." : isLogin ? "Login" : "Create provider account"}
                 </button>

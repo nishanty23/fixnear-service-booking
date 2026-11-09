@@ -6,7 +6,10 @@ const {
     login,
     getProfile,
     updateProfile,
-    changePassword
+    changePassword,
+    forgotPassword,
+    verifyOTP,
+    resetPassword
 } = require("../controllers/AuthControllers/authController");
 
 const {
@@ -24,5 +27,12 @@ router.get("/me", authenticateUser, getProfile);
 router.put("/profile", authenticateUser, updateProfile);
 
 router.put("/change-password", authenticateUser, changePassword);
+
+// Forgot Password Routes
+router.post("/forgot-password", forgotPassword);
+
+router.post("/verify-otp", verifyOTP);
+
+router.post("/reset-password", resetPassword);
 
 module.exports = router;
