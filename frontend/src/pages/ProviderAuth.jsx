@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { loginProvider, registerProvider } from "../services/authService";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { loginProvider } from "../services/authService";
 
 export default function ProviderAuth({ mode }) {
     const navigate = useNavigate();
+    const location = useLocation();
     const isLogin = mode === "login";
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const registrationMessage = location.state?.message || "";
 
     const submit = async event => {
         event.preventDefault();
@@ -15,17 +17,10 @@ export default function ProviderAuth({ mode }) {
         const form = new FormData(event.currentTarget);
 
         try {
-            const response = isLogin
-                ? await loginProvider(form.get("email"), form.get("password"))
-                : await registerProvider(
-                    form.get("name"),
-                    form.get("email"),
-                    form.get("password")
-                );
-
-            const loginResponse = isLogin
-                ? response
-                : await loginProvider(form.get("email"), form.get("password"));
+            const loginResponse = await loginProvider(
+                form.get("email"),
+                form.get("password")
+            );
 
             localStorage.setItem("token", loginResponse.data.token);
             localStorage.setItem("user", JSON.stringify(loginResponse.data.user));
@@ -59,6 +54,7 @@ export default function ProviderAuth({ mode }) {
                         : "Create a separate service provider account."}
                 </p>
                 {error && <p role="alert" className="mt-4 rounded-lg bg-[#fde7e7] px-4 py-3 text-sm text-[#a23a3a]">{error}</p>}
+                {registrationMessage && <p role="status" className="mt-4 rounded-lg bg-[#e0f4e5] px-4 py-3 text-sm text-[#247344]">{registrationMessage}</p>}
 
                 {!isLogin && (
                     <input name="name" required placeholder="Full name" className="mt-6 w-full rounded-lg border border-[#dce5dd] p-3" />
@@ -69,12 +65,12 @@ export default function ProviderAuth({ mode }) {
                     {loading ? "Please wait..." : isLogin ? "Login" : "Create provider account"}
                 </button>
                 <p className="mt-6 text-center text-[13px] text-[#78857b]">
-                    {isLogin ? "Need a provider account? " : "Already registered? "}
+                    Need a provider account?{" "}
                     <Link
-                        to={isLogin ? "/provider/register" : "/provider/login"}
+                        to="/provider/register"
                         className="font-bold text-[#247c4b] hover:underline"
                     >
-                        {isLogin ? "Register" : "Login"}
+                        Register
                     </Link>
                 </p>
             </form>
