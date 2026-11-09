@@ -208,6 +208,11 @@ const rescheduleBooking = async (req, res) => {
         booking.scheduledDate = newDate;
         await booking.save();
 
+        return res.status(200).json({
+            success: true,
+            message: "Booking rescheduled successfully",
+            booking
+        });
     }
     catch(error) {
         console.log(error);

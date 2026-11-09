@@ -3,7 +3,8 @@ import api from "../services/api";
 import {
     cancelRequest,
     getCustomerRequests,
-    hideRequestFromHistory
+    hideRequestFromHistory,
+    rescheduleRequest
 } from "../services/requestService";
 import MessagePage from "../components/MessagePage";
 
@@ -17,6 +18,11 @@ export default function Bookings() {
     const [comment, setComment] = useState("");
     const [message, setMessage] = useState("");
     const [reviewed, setReviewed] = useState([]);
+    const [rescheduleId, setRescheduleId] = useState(null);
+    const [rescheduleDate, setRescheduleDate] = useState("");
+    const [rescheduleMinimum] = useState(() =>
+        new Date(Date.now() + 60 * 60 * 1000).toISOString().slice(0, 16)
+    );
 
     useEffect(() => {
         if (!user || user.role !== "USER") {
@@ -70,6 +76,25 @@ export default function Bookings() {
         }
     };
 
+    const submitReschedule = async event => {
+        event.preventDefault();
+        try {
+            await rescheduleRequest(rescheduleId, rescheduleDate);
+            setRequests(currentRequests =>
+                currentRequests.map(request =>
+                    request._id === rescheduleId
+                        ? { ...request, scheduledDate: rescheduleDate }
+                        : request
+                )
+            );
+            setRescheduleId(null);
+            setRescheduleDate("");
+            setMessage("Booking rescheduled successfully.");
+        } catch (error) {
+            setMessage(error.response?.data?.message || "Unable to reschedule booking.");
+        }
+    };
+
     if (!user) {
         return <MessagePage title="Login required" text="Please log in to view your bookings." />;
     }
@@ -95,8 +120,8 @@ export default function Bookings() {
         event.preventDefault();
 
         try {
-            await api.post("/reviews", {
-                serviceRequest: reviewId,
+            await api.post("/user/reviews", {
+                bookingId: reviewId,
                 rating: rating,
                 comment: comment
             });
@@ -171,6 +196,39 @@ export default function Bookings() {
                             >
                                 Cancel Booking
                             </button>
+                        )}
+
+                        {(request.status === "PENDING" || request.status === "ACCEPTED") && (
+                            <button
+                                type="button"
+                                className="inline-flex shrink-0 items-center justify-center rounded-lg border border-[#c7dfcf] bg-white px-[19px] py-[11px] text-[13px] font-bold text-[#247c4b]"
+                                onClick={() => {
+                                    setRescheduleId(request._id);
+                                    setRescheduleDate("");
+                                    setMessage("");
+                                }}
+                            >
+                                Reschedule
+                            </button>
+                        )}
+
+                        {rescheduleId === request._id && (
+                            <form onSubmit={submitReschedule} className="mt-4 flex w-full flex-wrap gap-3">
+                                <input
+                                    type="datetime-local"
+                                    required
+                                    value={rescheduleDate}
+                                    onChange={event => setRescheduleDate(event.target.value)}
+                                    min={rescheduleMinimum}
+                                    className="rounded-lg border border-[#dce5dd] p-3"
+                                />
+                                <button type="submit" className="rounded-lg bg-[#247c4b] px-4 py-3 text-sm font-bold text-white">
+                                    Save date
+                                </button>
+                                <button type="button" onClick={() => setRescheduleId(null)} className="rounded-lg border px-4 py-3 text-sm font-bold">
+                                    Cancel
+                                </button>
+                            </form>
                         )}
 
                         {(request.status === "COMPLETED" || request.status === "CANCELLED") && (

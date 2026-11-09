@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { searchServices } from "../services/catalogService";
 
 export default function Services() {
     const [searchParams] = useSearchParams();
     const search = searchParams.get("search")?.trim() || "";
+    const category = searchParams.get("category") || "";
     const [services, setServices] = useState([]);
-    const [loading, setLoading] = useState(Boolean(search));
+    const [loading, setLoading] = useState(Boolean(search || category));
     const [error, setError] = useState("");
 
     useEffect(() => {
-        if (!search) {
+        if (!search && !category) {
             setServices([]);
             setLoading(false);
             return;
@@ -21,7 +22,7 @@ export default function Services() {
             setError("");
 
             try {
-                const response = await searchServices(search);
+                const response = await searchServices(search, category);
                 setServices(response.data.services || []);
             } catch (requestError) {
                 setError(
@@ -34,7 +35,7 @@ export default function Services() {
         };
 
         loadServices();
-    }, [search]);
+    }, [search, category]);
 
     return (
         <main className="min-h-[600px] bg-[#f7faf7] px-5 py-12 sm:px-10 lg:px-[8%]">
@@ -43,7 +44,7 @@ export default function Services() {
                     SERVICE SEARCH
                 </span>
                 <h1 className="mt-3 text-3xl font-bold text-[#183d29]">
-                    {search ? `Results for "${search}"` : "Search for a service"}
+                    {search ? `Results for "${search}"` : "Services"}
                 </h1>
 
                 {loading && <p className="mt-8 text-[#75847a]">Searching services...</p>}
@@ -78,7 +79,15 @@ export default function Services() {
                                         {service.provider?.city || ""}
                                     </p>
                                 </div>
-                                <strong className="text-[#247c4b]">₹{service.price}</strong>
+                                <div className="text-right">
+                                    <strong className="block text-[#247c4b]">₹{service.price}</strong>
+                                    <Link
+                                        to={`/services/${service._id}`}
+                                        className="mt-2 inline-block text-xs font-bold text-[#247c4b] hover:underline"
+                                    >
+                                        View details
+                                    </Link>
+                                </div>
                             </div>
                         </article>
                     ))}

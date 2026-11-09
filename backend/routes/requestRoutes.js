@@ -2,12 +2,8 @@
 const express = require("express");
 
 const {
-  createRequest,
-  getMyRequests,
   getProviderRequests,
-  updateRequestStatus,
-  cancelRequest,
-  hideRequestFromHistory
+  updateRequestStatus
 } = require("../controllers/ProviderControllers/requestController");
 
 const {
@@ -16,35 +12,6 @@ const {
 } = require("../middleware/authMiddleware");
 
 const router = express.Router();
-
-// Customer routes
-router.post(
-  "/",
-  authenticateUser,
-  authorizeRoles("USER"),
-  createRequest
-);
-
-router.get(
-  "/my",
-  authenticateUser,
-  authorizeRoles("USER"),
-  getMyRequests
-);
-
-router.put(
-  "/:id/hide",
-  authenticateUser,
-  authorizeRoles("USER"),
-  hideRequestFromHistory
-);
-
-router.put(
-  "/:id/cancel",
-  authenticateUser,
-  authorizeRoles("USER"),
-  cancelRequest
-);
 
 // Service provider routes
 router.get(

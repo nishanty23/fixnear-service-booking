@@ -1,8 +1,5 @@
 import {Button, Rating} from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import BoltIcon from "@mui/icons-material/Bolt";
-import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 
 import carpenter from "../../../assets/carpenter.jpg";
@@ -11,56 +8,11 @@ import painter from "../../../assets/painter.jpg";
 import electrician from "../../../assets/electrician.jpg";
 
 import { useEffect, useState } from "react";
-import { getNearbyCategories } from "../../../services/catalogService";
+import { getNearbyCategories, getServices } from "../../../services/catalogService";
 import { getCustomerRequests } from "../../../services/requestService";
 import { useLocation } from "../../../context/LocationContext.jsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../../../components/Footer.jsx";
-
-const popularServices = [
-    {
-        id: 1,
-        name: "Intense Bathroom Cleaning",
-        rating: 4.81,
-        reviews: 124,
-        price: 918,
-        originalPrice: 998,
-        duration: "60 mins",
-    },
-    {
-        id: 2,
-        name: "Foam-Jet AC Service",
-        rating: 4.75,
-        reviews: 86,
-        price: 599,
-        duration: "45 mins",
-    },
-    {
-        id: 3,
-        name: "Fabric Sofa Cleaning",
-        rating: 4.87,
-        reviews: 102,
-        price: 399,
-        duration: "30 mins",
-    },
-    {
-        id: 4,
-        name: "Full Home Deep Cleaning",
-        rating: 4.79,
-        reviews: 215,
-        price: 3499,
-        duration: "180 mins",
-    },
-    {
-        id: 5,
-        name: "AC Repair",
-        rating: 4.73,
-        reviews: 74,
-        price: 299,
-        duration: "45 mins",
-    },
-];
-
 
 const ImagePlaceholder = ({ className = "", label = "Service image" }) => {
     return (
@@ -75,8 +27,14 @@ const ImagePlaceholder = ({ className = "", label = "Service image" }) => {
 
 
 const CategoryCard = ({ category }) => {
+    const navigate = useNavigate();
+
     return (
-        <button className="group flex min-w-0 flex-col items-center rounded-xl p-2 text-center transition-all duration-200 hover:bg-[#eef5ef]">
+        <button
+            type="button"
+            onClick={() => navigate(`/services?category=${category._id}`)}
+            className="group flex min-w-0 flex-col items-center rounded-xl p-2 text-center transition-all duration-200 hover:bg-[#eef5ef]"
+        >
 
             <ImagePlaceholder
                 label="Image"
@@ -95,7 +53,7 @@ const CategoryCard = ({ category }) => {
 
 const PopularServiceCard = ({ service }) => {
     return (
-        <div className="group min-w-0 cursor-pointer">
+        <Link to={`/services/${service._id}`} className="group min-w-0 cursor-pointer">
 
             {/* Service Image */}
             <div className="relative overflow-hidden rounded-xl">
@@ -110,7 +68,7 @@ const PopularServiceCard = ({ service }) => {
                         sx={{ fontSize: 14 }}
                         className="mr-1 align-middle"
                     />
-                    {service.duration}
+                    {service.priceType === "HOURLY" ? "Hourly service" : "Bookable service"}
                 </div>
 
             </div>
@@ -133,11 +91,11 @@ const PopularServiceCard = ({ service }) => {
                     />
 
                     <span className="text-sm text-gray-600">
-                        {service.rating}
+                        {service.provider?.averageRating || "New"}
                     </span>
 
                     <span className="text-xs text-gray-400">
-                        ({service.reviews})
+                        ({service.provider?.reviewCount || 0})
                     </span>
 
                 </div>
@@ -149,17 +107,10 @@ const PopularServiceCard = ({ service }) => {
                         ₹{service.price.toLocaleString("en-IN")}
                     </span>
 
-                    {service.originalPrice && (
-                        <span className="text-sm text-gray-400 line-through">
-                            ₹{service.originalPrice.toLocaleString("en-IN")}
-                        </span>
-                    )}
-
                 </div>
 
             </div>
-
-        </div>
+            </Link>
     );
 };
 
@@ -273,8 +224,8 @@ const HeroSection = ({ categories, loading, error }) => {
                                 />
                             ))}
 
-                            <button
-                                type="button"
+                            <Link
+                                to="/services"
                                 className="group flex flex-col items-center justify-center rounded-xl p-2 text-center transition-colors hover:bg-[#eef5ef]"
                             >
                                 <div className="mb-3 flex h-20 w-full items-center justify-center rounded-lg bg-gray-100">
@@ -287,7 +238,7 @@ const HeroSection = ({ categories, loading, error }) => {
                                 <h3 className="text-sm font-semibold text-gray-800 group-hover:text-[#247c4b]">
                                     See all
                                 </h3>
-                            </button>
+                            </Link>
                         </div>
                     )}
                 </div>
@@ -313,7 +264,7 @@ const HeroSection = ({ categories, loading, error }) => {
 // MOST BOOKED SERVICES SECTION
 // ==========================================
 
-const MostBookedServices = () => {
+const MostBookedServices = ({ services, loading, error }) => {
     return (
         <section className="mt-20">
 
@@ -342,11 +293,15 @@ const MostBookedServices = () => {
 
 
             {/* Service Cards */}
+            {loading && <p className="text-sm text-gray-500">Loading services...</p>}
+            {error && <p className="text-sm text-red-600">{error}</p>}
+            {!loading && !error && services.length === 0 && (
+                <p className="text-sm text-gray-500">No services are available yet.</p>
+            )}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-
-                {popularServices.map((service) => (
+                {services.slice(0, 10).map((service) => (
                     <PopularServiceCard
-                        key={service.id}
+                        key={service._id}
                         service={service}
                     />
                 ))}
@@ -457,8 +412,18 @@ const HomePage = () => {
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [categoryError, setCategoryError] = useState("");
     const [upcomingBookings, setUpcomingBookings] = useState([]);
+    const [services, setServices] = useState([]);
+    const [loadingServices, setLoadingServices] = useState(true);
+    const [serviceError, setServiceError] = useState("");
     const [loadingBookings, setLoadingBookings] = useState(false);
     const [bookingError, setBookingError] = useState("");
+
+    useEffect(() => {
+        getServices()
+            .then(response => setServices(response.data.services || []))
+            .catch(error => setServiceError(error.response?.data?.message || "Unable to load services."))
+            .finally(() => setLoadingServices(false));
+    }, []);
 
     useEffect(() => {
         const loadNearbyCategories = async () => {
@@ -537,7 +502,11 @@ const HomePage = () => {
                         error={bookingError}
                     />
 
-                    <MostBookedServices />
+                    <MostBookedServices
+                        services={services}
+                        loading={loadingServices}
+                        error={serviceError}
+                    />
                 </div>
             </main>
             <Footer />

@@ -6,17 +6,14 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 
 // Route imports
-const authRoutes = require("./routes/authRoutes");
-const categoryRoutes = require("./routes/categoryRoutes");
 const providerRoutes = require("./routes/providerRoutes");
+const providerAuthRoutes = require("./routes/providerAuthRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
 const requestRoutes = require("./routes/requestRoutes");
-const reviewRoutes = require("./routes/reviewRoutes");
 
 // User routes Imports
 const userRouter = require("./routes/userRoutes/UserRoutes");
-const userBookingRouter = require("./routes/userRoutes/userBookingRoutes");
-const userReviewRouter = require("./routes/userRoutes/userReviewRoutes");
 
 
 //admin Routes imports
@@ -42,17 +39,14 @@ app.get("/", (req, res) => {
 });
 
 // API routes
-app.use("/api/auth", authRoutes);
-app.use("/api/categories", categoryRoutes);
 app.use("/api/providers", providerRoutes);
+app.use("/api/provider/auth", providerAuthRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/requests", requestRoutes);
-app.use("/api/reviews", reviewRoutes);
 
 // User API routes
 app.use("/api/user", userRouter);
-app.use("/api/user/booking", userBookingRouter);
-app.use("/api/user/review", userReviewRouter);
+app.use("/api/admin/categories", categoryRoutes);
 
 //Admin API routes
 app.use("/api/admin/auth", adminAuthRoutes);

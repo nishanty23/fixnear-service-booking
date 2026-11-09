@@ -1,8 +1,6 @@
 const express = require("express");
 
 const {
-  getProviders,
-  getProviderById,
   createProviderProfile,
   updateProviderProfile
 } = require("../controllers/ProviderControllers/providerController");
@@ -14,15 +12,10 @@ const {
 
 const router = express.Router();
 
-// Public routes
-router.get("/", getProviders);
-router.get("/:id", getProviderById);
-
-// USER can submit provider application
 router.post(
   "/profile",
   authenticateUser,
-  authorizeRoles("USER"),
+  authorizeRoles("SERVICE_PROVIDER"),
   createProviderProfile
 );
 

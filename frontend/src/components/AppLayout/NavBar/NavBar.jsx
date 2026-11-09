@@ -1,13 +1,10 @@
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
 import Link from "@mui/material/Link";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SearchIcon from "@mui/icons-material/Search";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import MenuIcon from "@mui/icons-material/Menu";
 import { memo } from "react";
 
 import { useNavbar } from "./NavBar";
@@ -16,8 +13,7 @@ import LocationAutocomplete from "../LocationAutoComplete/LocationAutoComplete";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Services", href: "#" },
-  { label: "Become a Provider", href: "#" },
+  { label: "Services", href: "/services" },
 ];
 
 const Navbar = memo(() => {
@@ -30,6 +26,7 @@ const Navbar = memo(() => {
     handleLocationChange,
     handleSearchChange,
     handleSearch,
+    user,
   } = useNavbar();
 
   return (
@@ -103,15 +100,19 @@ const Navbar = memo(() => {
             />
           </div>
 
-          {/* profile */}
           <div className="order-2 flex items-center gap-3 md:order-none md:ml-4 md:gap-6">
+            {user && (
+              <span className="max-w-32 truncate text-sm font-bold text-[#254b32]">
+                {user.name}
+              </span>
+            )}
             <IconButton
-              aria-label="Account Menu"
+              aria-label="Open account menu"
               color="inherit"
               onClick={openDrawer}
-              className="h-10 w-10 p-0"
+              className="h-10 w-10 p-0 text-[#247c4b]"
             >
-              <AccountCircleOutlinedIcon fontSize="large" />
+              <MenuIcon fontSize="large" />
             </IconButton>
           </div>
         </Toolbar>
