@@ -1574,3 +1574,109 @@
     object-fit: contain;
     padding: 4px;
 }
+
+/* ==========================
+   ADMIN MANAGE CATEGORIES
+========================== */
+
+.admin-categories-page .admin-category-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: none;
+    border-radius: 7px;
+    background: #168653;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-categories-page .admin-category-add-btn:hover {
+    background: #116b41;
+}
+
+.admin-category-form-panel {
+    background: white;
+    padding: 24px;
+    margin-bottom: 22px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.admin-category-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.admin-category-form-header h3 {
+    margin: 0;
+    color: #173d2c;
+    font-size: 18px;
+}
+
+.admin-category-form-group {
+    margin-bottom: 18px;
+}
+
+.admin-category-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #34483c;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.admin-category-form-group input,
+.admin-category-form-group textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d9e2dc;
+    border-radius: 7px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    outline: none;
+}
+
+.admin-category-form-group input:focus,
+.admin-category-form-group textarea:focus {
+    border-color: #168653;
+}
+
+.admin-category-form-group textarea {
+    resize: vertical;
+}
+
+.admin-category-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.admin-category-form-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.admin-category-icon {
+    margin-right: 9px;
+    color: #168653;
+    vertical-align: middle;
+}
+
+@media (max-width: 650px) {
+    .admin-categories-page .admin-dashboard-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-category-form-actions {
+        flex-direction: column;
+    }
+}
