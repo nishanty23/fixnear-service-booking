@@ -7,6 +7,7 @@ import {
 } from "../services/requestService";
 import { getCategories } from "../services/catalogService";
 import { createService } from "../services/providerService";
+import { validateImage } from "../utils/imageValidation";
 
 export default function ProviderDashboardPage() {
     const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -17,6 +18,16 @@ export default function ProviderDashboardPage() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [previewImage, setPreviewImage] = useState("");
+
+    useEffect(() => {
+        return () => {
+            if (previewImage.startsWith("blob:")) {
+                URL.revokeObjectURL(previewImage);
+            }
+        };
+    }, [previewImage]);
 
     useEffect(() => {
         if (user?.role !== "SERVICE_PROVIDER") return;
@@ -61,21 +72,19 @@ export default function ProviderDashboardPage() {
         event.preventDefault();
 
         const formElement = event.currentTarget;
-        const form = new FormData(formElement);
+        const formData = new FormData(formElement);
 
         setLoading(true);
         setMessage("");
 
-        const serviceData = {
-            name: form.get("name"),
-            category: form.get("category"),
-            description: form.get("description"),
-            price: Number(form.get("price")),
-            priceType: form.get("priceType")
-        };
+        if (!selectedImage) {
+            setMessage("Service image is required.");
+            setLoading(false);
+            return;
+        }
 
         try {
-            const response = await createService(serviceData);
+            const response = await createService(formData);
 
             setServices(current => [
                 response.data.service,
@@ -84,6 +93,8 @@ export default function ProviderDashboardPage() {
 
             setMessage("Service added successfully!");
             formElement.reset();
+            setSelectedImage(null);
+            setPreviewImage("");
         } catch (requestError) {
             setMessage(
                 requestError.response?.data?.message ||
@@ -92,6 +103,27 @@ export default function ProviderDashboardPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleImageChange = (event) => {
+        const file = event.target.files?.[0];
+        const validationError = validateImage(file);
+
+        if (validationError) {
+            event.target.value = "";
+            setSelectedImage(null);
+            setPreviewImage("");
+            setMessage(validationError);
+            return;
+        }
+
+        if (previewImage.startsWith("blob:")) {
+            URL.revokeObjectURL(previewImage);
+        }
+
+        setSelectedImage(file);
+        setPreviewImage(URL.createObjectURL(file));
+        setMessage("");
     };
 
     return (
@@ -168,6 +200,27 @@ export default function ProviderDashboardPage() {
                         <option value="STARTING_FROM">Starting From</option>
                     </select>
 
+                    <label className="flex flex-col gap-2 sm:col-span-2">
+                        <span className="text-sm font-semibold text-gray-700">
+                            Service image *
+                        </span>
+                        <input
+                            name="image"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={handleImageChange}
+                            required
+                            className="rounded-lg border p-3"
+                        />
+                        {previewImage && (
+                            <img
+                                src={previewImage}
+                                alt="Service preview"
+                                className="h-40 w-full rounded-lg object-cover sm:w-64"
+                            />
+                        )}
+                    </label>
+
                     <button
                         type="submit"
                         disabled={loading}
@@ -196,6 +249,13 @@ export default function ProviderDashboardPage() {
                     <div className="grid gap-4 sm:grid-cols-2">
                         {services.map(service => (
                             <div key={service._id} className="rounded-xl border bg-white p-5">
+                                {service.image && (
+                                    <img
+                                        src={service.image}
+                                        alt={service.name}
+                                        className="mb-4 h-40 w-full rounded-lg object-cover"
+                                    />
+                                )}
                                 <h3 className="font-bold">{service.name}</h3>
                                 <p className="mt-2 text-sm text-gray-600">
                                     {service.description}

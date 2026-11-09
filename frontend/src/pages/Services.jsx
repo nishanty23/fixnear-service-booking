@@ -61,6 +61,14 @@ export default function Services() {
                             className="rounded-xl border border-[#e1eae2] bg-white p-5 shadow-sm"
                             key={service._id}
                         >
+                            <img
+                                src={service.image || "/assets/fixnear-icon.png"}
+                                alt={service.name}
+                                className="mb-4 h-40 w-full rounded-lg object-cover"
+                                onError={(event) => {
+                                    event.currentTarget.src = "/assets/fixnear-icon.png";
+                                }}
+                            />
                             <span className="text-xs font-bold text-[#348356]">
                                 {service.category?.name || "Home Service"}
                             </span>

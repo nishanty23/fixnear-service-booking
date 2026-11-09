@@ -4,8 +4,7 @@ import {
     FiPlus,
     FiEdit2,
     FiTrash2,
-    FiX,
-    FiTag
+    FiX
 } from "react-icons/fi";
 
 import {
@@ -14,6 +13,7 @@ import {
     updateCategory,
     deleteCategory
 } from "../services/categoryService";
+import { validateImage } from "../../utils/imageValidation";
 
 import "../styles/admin.css";
 
@@ -28,6 +28,8 @@ function ManageCategories() {
 
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [previewImage, setPreviewImage] = useState("");
 
     const [formData, setFormData] = useState({
         name: "",
@@ -60,6 +62,8 @@ function ManageCategories() {
     const handleAddCategory = () => {
         setEditingId(null);
         setFormData({ name: "", description: "" });
+        setSelectedImage(null);
+        setPreviewImage("");
         setError("");
         setMessage("");
         setShowForm(true);
@@ -72,9 +76,51 @@ function ManageCategories() {
             name: category.name,
             description: category.description || ""
         });
+        setSelectedImage(null);
+        setPreviewImage(category.image || "");
         setError("");
         setMessage("");
         setShowForm(true);
+    };
+
+    const closeForm = () => {
+        setShowForm(false);
+        setEditingId(null);
+        setFormData({ name: "", description: "" });
+        setSelectedImage(null);
+        setPreviewImage("");
+        setError("");
+    };
+
+    useEffect(() => {
+        return () => {
+            if (selectedImage && previewImage.startsWith("blob:")) {
+                URL.revokeObjectURL(previewImage);
+            }
+        };
+    }, [selectedImage, previewImage]);
+
+    const handleImageChange = (event) => {
+        const file = event.target.files?.[0];
+        const validationError = validateImage(file);
+
+        if (validationError) {
+            event.target.value = "";
+            setSelectedImage(null);
+            setPreviewImage(editingId
+                ? categories.find(category => category._id === editingId)?.image || ""
+                : "");
+            setError(validationError);
+            return;
+        }
+
+        if (selectedImage && previewImage.startsWith("blob:")) {
+            URL.revokeObjectURL(previewImage);
+        }
+
+        setSelectedImage(file);
+        setPreviewImage(URL.createObjectURL(file));
+        setError("");
     };
 
     // Handle input changes
@@ -99,15 +145,23 @@ function ManageCategories() {
             return;
         }
 
+        if (!editingId && !selectedImage) {
+            setError("Category image is required.");
+            return;
+        }
+
         try {
             setSaving(true);
             setError("");
             setMessage("");
 
-            const categoryData = {
-                name,
-                description
-            };
+            const categoryData = new FormData();
+            categoryData.append("name", name);
+            categoryData.append("description", description);
+
+            if (selectedImage) {
+                categoryData.append("image", selectedImage);
+            }
 
             if (editingId) {
                 await updateCategory(editingId, categoryData);
@@ -117,9 +171,7 @@ function ManageCategories() {
                 setMessage("Category created successfully.");
             }
 
-            setShowForm(false);
-            setEditingId(null);
-            setFormData({ name: "", description: "" });
+            closeForm();
 
             await fetchCategories();
 
@@ -206,10 +258,7 @@ function ManageCategories() {
                         <button
                             type="button"
                             className="admin-modal-close"
-                            onClick={() => {
-                                setShowForm(false);
-                                setError("");
-                            }}
+                            onClick={closeForm}
                         >
                             <FiX />
                         </button>
@@ -249,14 +298,30 @@ function ManageCategories() {
                             />
                         </div>
 
+                        <div className="admin-category-form-group">
+                            <label htmlFor="category-image">
+                                Category Image {editingId ? "(optional)" : "*"}
+                            </label>
+                            <input
+                                id="category-image"
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                onChange={handleImageChange}
+                            />
+                            {previewImage && (
+                                <img
+                                    className="admin-category-image-preview"
+                                    src={previewImage}
+                                    alt="Category preview"
+                                />
+                            )}
+                        </div>
+
                         <div className="admin-category-form-actions">
                             <button
                                 type="button"
                                 className="admin-clear-btn"
-                                onClick={() => {
-                                    setShowForm(false);
-                                    setError("");
-                                }}
+                                onClick={closeForm}
                             >
                                 Cancel
                             </button>
@@ -293,6 +358,7 @@ function ManageCategories() {
 
                         <thead>
                             <tr>
+                                <th>Image</th>
                                 <th>Category Name</th>
                                 <th>Description</th>
                                 <th>Created Date</th>
@@ -304,19 +370,29 @@ function ManageCategories() {
 
                             {loading ? (
                                 <tr>
-                                    <td colSpan="4" className="admin-table-empty">
+                                    <td colSpan="5" className="admin-table-empty">
                                         Loading categories...
                                     </td>
                                 </tr>
                             ) : categories.length === 0 ? (
                                 <tr>
-                                    <td colSpan="4" className="admin-table-empty">
+                                    <td colSpan="5" className="admin-table-empty">
                                         No categories found. Create your first category.
                                     </td>
                                 </tr>
                             ) : (
                                 categories.map((category) => (
                                     <tr key={category._id}>
+                                        <td>
+                                            <img
+                                                className="admin-category-table-image"
+                                                src={category.image || "/assets/fixnear-icon.png"}
+                                                alt={category.name}
+                                                onError={(event) => {
+                                                    event.currentTarget.src = "/assets/fixnear-icon.png";
+                                                }}
+                                            />
+                                        </td>
 
                                         <td className="admin-user-name">
                                             {category.name}

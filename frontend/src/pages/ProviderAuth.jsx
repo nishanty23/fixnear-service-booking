@@ -85,6 +85,12 @@ export default function ProviderAuth({ mode }) {
                         Register
                     </Link>
                 </p>
+                <Link
+                    to="/login"
+                    className="mt-4 block w-full rounded-lg border border-[#247c4b] px-5 py-3 text-center text-sm font-bold text-[#247c4b] transition hover:bg-[#eef5ef]"
+                >
+                    Back to user login
+                </Link>
             </form>
         </section>
     );
