@@ -17,5 +17,10 @@ export const changePassword = (currentPassword, newPassword) =>
 export const loginProvider = (email, password) =>
     api.post("/provider/auth/login", { email, password });
 
-export const registerProvider = (name, email, password) =>
-    api.post("/provider/auth/register", { name, email, password });
+export const registerProvider = (name, email, password, profile) =>
+    api.post("/provider/auth/register", {
+        name,
+        email,
+        password,
+        ...profile
+    });

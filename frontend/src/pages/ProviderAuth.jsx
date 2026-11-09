@@ -32,8 +32,10 @@ export default function ProviderAuth({ mode }) {
             window.dispatchEvent(new Event("fixnear-auth-change"));
             navigate("/provider/dashboard", { replace: true });
         } catch (requestError) {
+            const message = requestError.response?.data?.message;
+
             setError(
-                requestError.response?.data?.message ||
+                message ||
                 `Unable to ${isLogin ? "log in" : "register"} as a provider.`
             );
         } finally {

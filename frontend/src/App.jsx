@@ -19,6 +19,7 @@ import ManageUsers from "./adminFrontend/pages/ManageUsers.jsx";
 import ManageProviders from "./adminFrontend/pages/ManageProviders.jsx";
 import ManageServices from "./adminFrontend/pages/ManageServices.jsx";
 import ManageBookings from "./adminFrontend/pages/ManageBookings.jsx";
+import ManageCategories from "./adminFrontend/pages/ManageCategories.jsx";
 function AppContent() {
     const { pathname } = useLocation();
     const isAdminRoute = pathname.startsWith("/admin");
@@ -47,6 +48,7 @@ function AppContent() {
                     <Route path="providers" element={<ManageProviders />} />
                     <Route path="services" element={<ManageServices />} />
                     <Route path="bookings" element={<ManageBookings />} />
+                    <Route path="categories" element={<ManageCategories />} />
                 </Route>
             </Routes>
         </>
