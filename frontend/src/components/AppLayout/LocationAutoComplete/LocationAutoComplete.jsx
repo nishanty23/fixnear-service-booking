@@ -18,6 +18,7 @@ const LocationAutocomplete = memo(({ location, onLocationSelect }) => {
         <LocationOnOutlinedIcon className="shrink-0 text-neutral-500" />
 
         <InputBase
+          id="navbar-location-input"
           fullWidth
           value={inputValue}
           placeholder="Enter your location"

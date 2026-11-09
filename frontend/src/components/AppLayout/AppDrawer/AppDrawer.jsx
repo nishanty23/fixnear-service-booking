@@ -7,10 +7,12 @@ import { Link, useNavigate } from "react-router-dom";
 
 const AppDrawer = memo(({ open, onClose }) => {
     const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem("user") || "null");
 
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        window.dispatchEvent(new Event("fixnear-auth-change"));
         onClose();
         navigate("/login", { replace: true });
     };
@@ -35,7 +37,7 @@ const AppDrawer = memo(({ open, onClose }) => {
 
                 <div className="py-5">
                     <p className="text-lg font-semibold">
-                        Welcome to FixNear!
+                        {user ? `Welcome, ${user.name}!` : "Welcome to FixNear!"}
                     </p>
 
                     <p className="mt-1 text-sm text-neutral-500">
@@ -46,17 +48,19 @@ const AppDrawer = memo(({ open, onClose }) => {
                 <Divider />
 
                 <div className="flex flex-col gap-4 py-5">
-                    <button className="text-left hover:text-[#247c4b]">
+                    <Link to="/account" onClick={onClose} className="text-left hover:text-[#247c4b]">
                         My Profile
-                    </button>
-
-                    <Link to="/bookings" onClick={onClose} className="text-left hover:text-[#247c4b]">
-                        My Bookings
                     </Link>
 
-                    <button className="text-left hover:text-[#247c4b]">
+                    {user?.role === "USER" && (
+                        <Link to="/bookings" onClick={onClose} className="text-left hover:text-[#247c4b]">
+                            My Bookings
+                        </Link>
+                    )}
+
+                    <Link to="/account" onClick={onClose} className="text-left hover:text-[#247c4b]">
                         Settings
-                    </button>
+                    </Link>
 
                     <button
                         type="button"

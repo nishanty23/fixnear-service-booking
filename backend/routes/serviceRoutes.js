@@ -2,8 +2,6 @@
 const express = require("express");
 
 const {
-  getServices,
-  getServiceById,
   createService,
   updateService,
   deleteService
@@ -15,10 +13,6 @@ const {
 } = require("../middleware/authMiddleware");
 
 const router = express.Router();
-
-// Public routes
-router.get("/", getServices);
-router.get("/:id", getServiceById);
 
 // Service provider-only routes
 router.post(

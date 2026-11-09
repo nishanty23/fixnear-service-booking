@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const ServiceProvider = require("../../models/ServiceProvider");
+const ServiceCategory = require("../../models/ServiceCategory");
 
 // HELPER: ESCAPE REGULAR EXPRESSIONS
 const escapeRegex = (value) => {
@@ -180,6 +181,7 @@ const createProviderProfile = async (req, res) => {
   try {
     const {
       businessName,
+      category,
       description,
       phone,
       city,
@@ -210,6 +212,21 @@ const createProviderProfile = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Please provide all required profile fields as valid strings"
+      });
+    }
+
+    if (!category || !mongoose.isValidObjectId(category)) {
+      return res.status(400).json({
+        success: false,
+        message: "A valid service category is required"
+      });
+    }
+
+    const categoryExists = await ServiceCategory.exists({ _id: category });
+    if (!categoryExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Selected service category does not exist"
       });
     }
 
@@ -283,6 +300,7 @@ const createProviderProfile = async (req, res) => {
     const provider = await ServiceProvider.create({
       user: req.user._id,
       businessName: businessName.trim(),
+      category,
       description: description.trim(),
       phone: phone.trim(),
       city: city.trim(),

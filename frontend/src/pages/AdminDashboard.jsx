@@ -11,7 +11,7 @@ export default function AdminDashboard({ user }) {
 
     const load = async () => {
         try {
-            const response = await api.get("/categories");
+            const response = await api.get("/admin/categories");
             setCategories(response.data.categories || []);
         } catch (error) {
             setMessage(error.response?.data?.message || "Unable to load categories.");
@@ -26,7 +26,7 @@ export default function AdminDashboard({ user }) {
         event.preventDefault();
 
         try {
-            await api.post("/categories", { name: categoryName });
+            await api.post("/admin/categories", { name: categoryName });
             setCategoryName("");
             setMessage("Category created successfully.");
             await load();
@@ -45,7 +45,7 @@ export default function AdminDashboard({ user }) {
         event.preventDefault();
 
         try {
-            await api.put(`/categories/${editId}`, {
+            await api.put(`/admin/categories/${editId}`, {
                 name: editName
             });
 
@@ -66,7 +66,7 @@ export default function AdminDashboard({ user }) {
         if (!confirmed) return;
 
         try {
-            await api.delete(`/categories/${categoryId}`);
+            await api.delete(`/admin/categories/${categoryId}`);
             setMessage("Category deleted successfully.");
             await load();
         } catch (error) {

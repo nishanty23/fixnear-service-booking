@@ -1,22 +1,26 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { login } from "./login";
 
 export default function Login() {
     const navigate = useNavigate();
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const submit = async (event) => {
         event.preventDefault();
+        setError("");
+        setLoading(true);
 
         const form = new FormData(event.target);
         const result = await login(form.get("email"), form.get("password"));
 
-        if(!result.success) {
-            console.log(result.message);
-            return;
-        }
-        else {
+        if (!result.success) {
+            setError(result.message);
+        } else {
             navigate("/");
         }
+        setLoading(false);
 
     };
 
@@ -35,6 +39,7 @@ export default function Login() {
                 <p className="mt-2 text-[13px] text-[#78857b]">
                     Access your account and manage your services.
                 </p>
+                {error && <p role="alert" className="mt-4 rounded-lg bg-[#fde7e7] px-4 py-3 text-sm text-[#a23a3a]">{error}</p>}
 
                 <label
                     className="mt-6 block text-xs font-bold text-[#405a48]"
@@ -70,7 +75,7 @@ export default function Login() {
                     type="submit"
                     className="mt-6 w-full rounded-lg bg-[#247c4b] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-px hover:bg-[#185e38]"
                 >
-                    Login
+                    {loading ? "Logging in..." : "Login"}
                 </button>
 
                 <p className="mt-6 text-center text-[13px] text-[#78857b]">
@@ -82,6 +87,12 @@ export default function Login() {
                         Create one
                     </Link>
                 </p>
+                <Link
+                    to="/provider/login"
+                    className="mt-4 block w-full rounded-lg border border-[#247c4b] px-5 py-3 text-center text-sm font-bold text-[#247c4b] transition hover:bg-[#eef5ef]"
+                >
+                    Provider registration / login
+                </Link>
             </form>
         </section>
     );

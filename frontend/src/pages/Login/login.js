@@ -13,6 +13,7 @@ export const login = async (email, password) => {
 
         localStorage.setItem("token", token)
         localStorage.setItem("user", JSON.stringify(user));
+        window.dispatchEvent(new Event("fixnear-auth-change"));
 
         return {
             success: true,
@@ -22,7 +23,7 @@ export const login = async (email, password) => {
     catch(error) {
         return {
             success: false,
-            message: "Login failed"
+            message: error.response?.data?.message || error.message || "Login failed"
         }
     }
 }

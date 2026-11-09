@@ -1,11 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { register } from "./register";
 
 export default function Register() {
     const navigate = useNavigate();
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const submit = async (event) => {
         event.preventDefault();
+        setError("");
+        setLoading(true);
         const form = new FormData(event.target);
         const result = await register(
             form.get("name"),
@@ -16,8 +21,9 @@ export default function Register() {
         if (result.success) {
             navigate("/login");
         } else {
-            console.error(result.message);
+            setError(result.message);
         }
+        setLoading(false);
     };
 
     return (
@@ -35,6 +41,7 @@ export default function Register() {
                 <p className="mt-2 text-[13px] text-[#78857b]">
                     Join FixNear and find reliable local professionals.
                 </p>
+                {error && <p role="alert" className="mt-4 rounded-lg bg-[#fde7e7] px-4 py-3 text-sm text-[#a23a3a]">{error}</p>}
 
                 <label className="mt-6 block text-xs font-bold text-[#405a48]" htmlFor="name">
                     Full name
@@ -76,7 +83,7 @@ export default function Register() {
                     type="submit"
                     className="mt-6 w-full rounded-lg bg-[#247c4b] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-px hover:bg-[#185e38]"
                 >
-                    Create Account
+                    {loading ? "Creating account..." : "Create Account"}
                 </button>
                 <p className="mt-6 text-center text-[13px] text-[#78857b]">
                     Already registered?{" "}

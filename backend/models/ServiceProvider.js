@@ -13,6 +13,11 @@ const serviceProviderSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ServiceCategory",
+      required: false
+    },
     description: {
       type: String,
       required: true,

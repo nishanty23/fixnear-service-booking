@@ -4,7 +4,7 @@ const User = require("../../models/User");
 
 const register = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({
@@ -37,7 +37,7 @@ const register = async (req, res) => {
             name: name.trim(),
             email: normalizedEmail,
             password: hashedPassword,
-            role: role
+            role: req.providerRegistration ? "SERVICE_PROVIDER" : "USER"
         });
 
         res.status(201).json({
@@ -85,6 +85,13 @@ const login = async (req, res) => {
         if (!user) {
             return res.status(401).json({
                 message: "Invalid email or password"
+            });
+        }
+
+        if (req.providerLogin && user.role !== "SERVICE_PROVIDER") {
+            return res.status(403).json({
+                success: false,
+                message: "This account is not registered as a service provider"
             });
         }
 
@@ -136,6 +143,16 @@ const login = async (req, res) => {
             message: "Server error"
         });
     }
+};
+
+const registerProvider = (req, res) => {
+    req.providerRegistration = true;
+    return register(req, res);
+};
+
+const loginProvider = (req, res) => {
+    req.providerLogin = true;
+    return login(req, res);
 };
 
 const getProfile = async (req, res) => {
@@ -250,7 +267,9 @@ const changePassword = async (req, res) => {
 
 module.exports = {
     register,
+    registerProvider,
     login,
+    loginProvider,
     getProfile,
     updateProfile,
     changePassword
