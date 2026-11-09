@@ -62,6 +62,16 @@ const AppDrawer = memo(({ open, onClose }) => {
                         Settings
                     </Link>
 
+                    {user?.role === "SERVICE_PROVIDER" && (
+                        <Link
+                            to="/provider/dashboard"
+                            onClick={onClose}
+                            className="text-left hover:text-[#247c4b]"
+                        >
+                            Provider Dashboard
+                        </Link>
+                    )}
+
                     <Link
                         to="/about"
                         onClick={onClose}

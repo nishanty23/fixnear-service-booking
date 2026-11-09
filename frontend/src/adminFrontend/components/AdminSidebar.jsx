@@ -5,7 +5,8 @@ import {
     FiBriefcase,
     FiTool,
     FiCalendar,
-    FiTag
+    FiTag,
+    FiStar
 } from "react-icons/fi";
 
 function AdminSidebar() {
@@ -39,6 +40,11 @@ function AdminSidebar() {
             name: "Bookings",
             path: "/admin/bookings",
             icon: FiCalendar
+        }, 
+        {
+            name: "Reviews",
+            path: "/admin/reviews",
+            icon: FiStar
         }
     ];
 
