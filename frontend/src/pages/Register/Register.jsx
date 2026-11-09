@@ -1,6 +1,7 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { register } from "./register";
+import { registerUser } from "../../services/authService";
 
 export default function Register() {
     const navigate = useNavigate();
@@ -11,19 +12,28 @@ export default function Register() {
         event.preventDefault();
         setError("");
         setLoading(true);
-        const form = new FormData(event.target);
-        const result = await register(
-            form.get("name"),
-            form.get("email"),
-            form.get("password")
-        );
 
-        if (result.success) {
+        const form = new FormData(event.target);
+
+        try {
+            await registerUser(
+                form.get("name"),
+                form.get("email"),
+                form.get("password")
+            );
+
+            alert("Registration Successful! Please login to continue.");
+
             navigate("/login");
-        } else {
-            setError(result.message);
+
+        } catch (error) {
+            setError(
+                error.response?.data?.message ||
+                "Registration failed. Please try again."
+            );
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (
@@ -35,17 +45,25 @@ export default function Register() {
                 <span className="text-[11px] font-extrabold tracking-[2px] text-[#348356]">
                     GET STARTED
                 </span>
+
                 <h2 className="mt-3 font-[Manrope,sans-serif] text-[28px] font-bold text-[#183d29]">
                     Create an account
                 </h2>
+
                 <p className="mt-2 text-[13px] text-[#78857b]">
                     Join FixNear and find reliable local professionals.
                 </p>
-                {error && <p role="alert" className="mt-4 rounded-lg bg-[#fde7e7] px-4 py-3 text-sm text-[#a23a3a]">{error}</p>}
+
+                {error && (
+                    <p role="alert" className="mt-4 rounded-lg bg-[#fde7e7] px-4 py-3 text-sm text-[#a23a3a]">
+                        {error}
+                    </p>
+                )}
 
                 <label className="mt-6 block text-xs font-bold text-[#405a48]" htmlFor="name">
                     Full name
                 </label>
+
                 <input
                     id="name"
                     name="name"
@@ -57,6 +75,7 @@ export default function Register() {
                 <label className="mt-4 block text-xs font-bold text-[#405a48]" htmlFor="email">
                     Email address
                 </label>
+
                 <input
                     id="email"
                     name="email"
@@ -69,6 +88,7 @@ export default function Register() {
                 <label className="mt-4 block text-xs font-bold text-[#405a48]" htmlFor="password">
                     Password
                 </label>
+
                 <input
                     id="password"
                     name="password"
@@ -81,10 +101,12 @@ export default function Register() {
 
                 <button
                     type="submit"
-                    className="mt-6 w-full rounded-lg bg-[#247c4b] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-px hover:bg-[#185e38]"
+                    disabled={loading}
+                    className="mt-6 w-full rounded-lg bg-[#247c4b] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-px hover:bg-[#185e38] disabled:opacity-60"
                 >
                     {loading ? "Creating account..." : "Create Account"}
                 </button>
+
                 <p className="mt-6 text-center text-[13px] text-[#78857b]">
                     Already registered?{" "}
                     <Link to="/login" className="font-bold text-[#247c4b] hover:underline">

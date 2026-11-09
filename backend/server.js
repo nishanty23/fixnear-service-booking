@@ -11,6 +11,7 @@ const providerAuthRoutes = require("./routes/providerAuthRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
 const requestRoutes = require("./routes/requestRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 // User routes Imports
 const userRouter = require("./routes/userRoutes/UserRoutes");
@@ -47,6 +48,7 @@ app.use("/api/requests", requestRoutes);
 // User API routes
 app.use("/api/user", userRouter);
 app.use("/api/admin/categories", categoryRoutes);
+app.use("/api/auth", authRoutes);
 
 //Admin API routes
 app.use("/api/admin/auth", adminAuthRoutes);

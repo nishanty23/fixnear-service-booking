@@ -71,6 +71,15 @@ export default function Login() {
                     className="mt-2 w-full rounded-lg border border-[#dce5dd] bg-[#fcfdfc] p-3 outline-none transition focus:border-[#55a879] focus:ring-2 focus:ring-[#55a879]/20"
                 />
 
+                <div className="mt-3 flex justify-end">
+                    <Link
+                        to="/forgot-password"
+                        className="text-sm font-semibold text-[#247c4b] hover:underline"
+                    >
+                        Forgot Password?
+                    </Link>
+                </div>
+
                 <button
                     type="submit"
                     className="mt-6 w-full rounded-lg bg-[#247c4b] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-px hover:bg-[#185e38]"

@@ -128,6 +128,7 @@ const getProviderApplicationById = async (req, res) => {
 
 
 
+
 const approveProviderApplication = async (req, res) => {
     const session = await mongoose.startSession();
 
@@ -176,8 +177,8 @@ const approveProviderApplication = async (req, res) => {
                 throw error;
             }
 
-            // Check User Role
-            if (user.role !== "USER") {
+            // Allow both USER and SERVICE_PROVIDER roles
+            if (!["USER", "SERVICE_PROVIDER"].includes(user.role)) {
                 const error = new Error(
                     "User is not eligible for provider approval"
                 );
@@ -226,6 +227,8 @@ const approveProviderApplication = async (req, res) => {
         await session.endSession();
     }
 };
+
+
 
 
 const rejectProviderApplication = async (req, res) => {
@@ -301,8 +304,8 @@ const rejectProviderApplication = async (req, res) => {
                 throw error;
             }
 
-            // 6. Check User Role
-            if (user.role !== "USER") {
+            // 6. Allow both USER and SERVICE_PROVIDER roles
+            if (!["USER", "SERVICE_PROVIDER"].includes(user.role)) {
                 const error = new Error(
                     "User is not eligible for application rejection"
                 );
@@ -316,7 +319,10 @@ const rejectProviderApplication = async (req, res) => {
 
             await application.save({ session });
 
-            // User role remains USER
+            // 8. Reset User Role to USER
+            user.role = "USER";
+
+            await user.save({ session });
 
             rejectedProvider = {
                 providerId: application._id,
@@ -328,7 +334,7 @@ const rejectProviderApplication = async (req, res) => {
             };
         });
 
-        // 8. Success Response
+        // 9. Success Response
         return res.status(200).json({
             success: true,
             message: "Provider application rejected successfully",
@@ -351,6 +357,7 @@ const rejectProviderApplication = async (req, res) => {
         }
     }
 };
+
 
 
 const getAllApprovedProviders = async (req, res) => {
