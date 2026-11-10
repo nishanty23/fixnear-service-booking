@@ -1,22 +1,33 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { searchServices } from "../services/catalogService";
+import { getCategories, searchServices } from "../services/catalogService";
 
 export default function Services() {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const search = searchParams.get("search")?.trim() || "";
     const category = searchParams.get("category") || "";
+    const [categories, setCategories] = useState([]);
     const [services, setServices] = useState([]);
-    const [loading, setLoading] = useState(Boolean(search || category));
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     useEffect(() => {
-        if (!search && !category) {
-            setServices([]);
-            setLoading(false);
-            return;
-        }
+        const loadCategories = async () => {
+            try {
+                const response = await getCategories();
+                setCategories(response.data.categories || []);
+            } catch (requestError) {
+                setError(
+                    requestError.response?.data?.message ||
+                    "Unable to load service categories."
+                );
+            }
+        };
 
+        loadCategories();
+    }, []);
+
+    useEffect(() => {
         const loadServices = async () => {
             setLoading(true);
             setError("");
@@ -47,11 +58,49 @@ export default function Services() {
                     {search ? `Results for "${search}"` : "Services"}
                 </h1>
 
-                {loading && <p className="mt-8 text-[#75847a]">Searching services...</p>}
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <label
+                        htmlFor="service-category"
+                        className="text-sm font-bold text-[#405a48]"
+                    >
+                        Filter by category
+                    </label>
+                    <select
+                        id="service-category"
+                        value={category}
+                        onChange={(event) => {
+                            const nextParams = new URLSearchParams(searchParams);
+                            const selectedCategory = event.target.value;
+
+                            if (selectedCategory) {
+                                nextParams.set("category", selectedCategory);
+                            } else {
+                                nextParams.delete("category");
+                            }
+
+                            setSearchParams(nextParams);
+                        }}
+                        className="rounded-lg border border-[#dce5dd] bg-white px-4 py-2 text-sm text-[#254b32] outline-none focus:border-[#247c4b]"
+                    >
+                        <option value="">All categories</option>
+                        {categories.map((serviceCategory) => (
+                            <option
+                                key={serviceCategory._id}
+                                value={serviceCategory._id}
+                            >
+                                {serviceCategory.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {loading && <p className="mt-8 text-[#75847a]">Loading services...</p>}
                 {error && <p className="mt-8 text-red-600">{error}</p>}
-                {!loading && !error && search && services.length === 0 && (
+                {!loading && !error && services.length === 0 && (
                     <p className="mt-8 text-[#75847a]">
-                        No services matched your search.
+                        {search
+                            ? "No services matched your search."
+                            : "No services are available yet."}
                     </p>
                 )}
 
@@ -61,6 +110,14 @@ export default function Services() {
                             className="rounded-xl border border-[#e1eae2] bg-white p-5 shadow-sm"
                             key={service._id}
                         >
+                            <img
+                                src={service.image || "/assets/fixnear-icon.png"}
+                                alt={service.name}
+                                className="mb-4 h-40 w-full rounded-lg object-cover"
+                                onError={(event) => {
+                                    event.currentTarget.src = "/assets/fixnear-icon.png";
+                                }}
+                            />
                             <span className="text-xs font-bold text-[#348356]">
                                 {service.category?.name || "Home Service"}
                             </span>

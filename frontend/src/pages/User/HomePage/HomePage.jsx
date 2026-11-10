@@ -14,13 +14,17 @@ import { useLocation } from "../../../context/LocationContext.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "../../../components/Footer.jsx";
 
-const ImagePlaceholder = ({ className = "", label = "Service image" }) => {
+const ServiceImage = ({ src, alt, className = "" }) => {
     return (
-        <div
-            className={`flex items-center justify-center bg-gray-100 text-gray-400 ${className}`}
-        >
-            <span className="text-xs font-medium">{label}</span>
-        </div>
+        <img
+            src={src || "/assets/fixnear-icon.png"}
+            alt={alt}
+            className={`object-cover ${className}`}
+            onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = "/assets/fixnear-icon.png";
+            }}
+        />
     );
 };
 
@@ -36,8 +40,9 @@ const CategoryCard = ({ category }) => {
             className="group flex min-w-0 flex-col items-center rounded-xl p-2 text-center transition-all duration-200 hover:bg-[#eef5ef]"
         >
 
-            <ImagePlaceholder
-                label="Image"
+            <ServiceImage
+                src={category.image}
+                alt={category.name}
                 className="mb-3 h-20 w-full rounded-lg transition-transform duration-200 group-hover:scale-[1.02]"
             />
 
@@ -58,8 +63,9 @@ const PopularServiceCard = ({ service }) => {
             {/* Service Image */}
             <div className="relative overflow-hidden rounded-xl">
 
-                <ImagePlaceholder
-                    label="Service image"
+                <ServiceImage
+                    src={service.image}
+                    alt={service.name}
                     className="h-52 w-full transition-transform duration-300 group-hover:scale-[1.03]"
                 />
 

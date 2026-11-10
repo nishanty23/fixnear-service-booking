@@ -1,7 +1,19 @@
 export default function ServiceCard({ service, onBook }) {
     return (
         <div className="service-card">
-            <div className="service-icon">🔧</div>
+            {service.image ? (
+                <img
+                    src={service.image}
+                    alt={service.name}
+                    className="service-image"
+                    onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = "/assets/fixnear-icon.png";
+                    }}
+                />
+            ) : (
+                <div className="service-icon">🔧</div>
+            )}
             <span className="service-category">
                 {service.category?.name || "Home Service"}
             </span>

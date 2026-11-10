@@ -1594,6 +1594,22 @@
     cursor: pointer;
 }
 
+.admin-category-image-preview {
+    display: block;
+    width: 180px;
+    height: 110px;
+    margin-top: 10px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.admin-category-table-image {
+    width: 56px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
 .admin-categories-page .admin-category-add-btn:hover {
     background: #116b41;
 }

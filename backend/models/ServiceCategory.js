@@ -6,17 +6,29 @@ const serviceCategorySchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      trim: true
+      trim: true,
     },
 
     description: {
       type: String,
-      trim: true
-    }
+      trim: true,
+    },
+
+    // Category image URL from Cloudinary
+    image: {
+      type: String,
+      required: true,
+    },
+
+    // Cloudinary public ID for image management
+    imagePublicId: {
+      type: String,
+      required: true,
+    },
   },
   {
-    timestamps: true
-  }
+    timestamps: true,
+  },
 );
 
 module.exports = mongoose.model("ServiceCategory", serviceCategorySchema);

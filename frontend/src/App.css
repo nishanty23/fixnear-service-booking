@@ -280,6 +280,14 @@ button {
     margin-bottom: 15px;
 }
 
+.service-image {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
 .service-category {
     color: #39885a;
     font-size: 11px;

@@ -165,6 +165,13 @@ export default function BecomeProvider() {
                 >
                     Already registered? Log in
                 </button>
+                <button
+                    type="button"
+                    onClick={() => navigate("/login")}
+                    className="mt-4 block w-full rounded-lg border border-[#247c4b] px-5 py-3 text-sm font-bold text-[#247c4b] transition hover:bg-[#eef5ef]"
+                >
+                    Back to user login
+                </button>
             </div>
         </main>
     );

@@ -190,6 +190,14 @@ export default function ServiceDetails() {
 
                 <section className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
                     <div className="rounded-2xl border border-[#e1eae2] bg-white p-6 shadow-sm sm:p-8">
+                        <img
+                            src={service.image || "/assets/fixnear-icon.png"}
+                            alt={service.name}
+                            className="mb-6 h-64 w-full rounded-xl object-cover"
+                            onError={(event) => {
+                                event.currentTarget.src = "/assets/fixnear-icon.png";
+                            }}
+                        />
                         <span className="text-xs font-extrabold tracking-[2px] text-[#348356]">
                             {service.category?.name || "HOME SERVICE"}
                         </span>
