@@ -97,7 +97,8 @@ const getNearbyCategories = async(req, res) => {
         $group: {
           _id: "$category._id",
           name: { $first: "$category.name" },
-          description: { $first: "$category.description" }
+          description: { $first: "$category.description" },
+          image: { $first: "$category.image" }
         }
       },
       { $sort: { name: 1 } }

@@ -28,6 +28,7 @@ const Navbar = memo(() => {
     handleSearch,
     user,
   } = useNavbar();
+  const isProvider = user?.role === "SERVICE_PROVIDER";
 
   return (
     <>
@@ -55,50 +56,56 @@ const Navbar = memo(() => {
           </Link>
 
           {/* Text links (hidden below lg) */}
-          <nav
-            aria-label="Primary"
-            className="ml-2 hidden items-center gap-2 lg:flex"
-          >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                underline="none"
-                color="inherit"
-                className="whitespace-nowrap rounded-lg px-4 py-2 text-lg text-neutral-700 hover:text-neutral-900"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          {!isProvider && (
+            <nav
+              aria-label="Primary"
+              className="ml-2 hidden items-center gap-2 lg:flex"
+            >
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  underline="none"
+                  color="inherit"
+                  className="whitespace-nowrap rounded-lg px-4 py-2 text-lg text-neutral-700 hover:text-neutral-900"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          )}
 
           <div className="order-1 flex-1 md:order-none" />
 
           {/* Location */}
-          <div className="order-3 w-full md:order-none md:w-60 xl:w-80">
-              <LocationAutocomplete
-                  location={location}
-                  onLocationSelect={handleLocationChange}
-              />
-          </div>
+          {!isProvider && (
+            <div className="order-3 w-full md:order-none md:w-60 xl:w-80">
+                <LocationAutocomplete
+                    location={location}
+                    onLocationSelect={handleLocationChange}
+                />
+            </div>
+          )}
 
           {/* Search */}
-          <div className="order-4 flex h-[52px] w-full items-center gap-3 rounded-[10px] border border-neutral-200 px-[18px] text-neutral-700 focus-within:border-neutral-900 focus-within:ring-2 focus-within:ring-neutral-900 focus-within:ring-offset-2 md:order-none md:w-64 lg:h-[60px] xl:w-[335px]">
-            <SearchIcon />
-            <InputBase
-              fullWidth
-              placeholder="Search for ‘Kitchen cleaning’"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleSearch();
-                }
-              }}
-              inputProps={{ "aria-label": "Search services" }}
-              className="text-base lg:text-lg"
-            />
-          </div>
+          {!isProvider && (
+            <div className="order-4 flex h-[52px] w-full items-center gap-3 rounded-[10px] border border-neutral-200 px-[18px] text-neutral-700 focus-within:border-neutral-900 focus-within:ring-2 focus-within:ring-neutral-900 focus-within:ring-offset-2 md:order-none md:w-64 lg:h-[60px] xl:w-[335px]">
+              <SearchIcon />
+              <InputBase
+                fullWidth
+                placeholder="Search for ‘Kitchen cleaning’"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+                inputProps={{ "aria-label": "Search services" }}
+                className="text-base lg:text-lg"
+              />
+            </div>
+          )}
 
           <div className="order-2 flex items-center gap-3 md:order-none md:ml-4 md:gap-6">
             {user && (

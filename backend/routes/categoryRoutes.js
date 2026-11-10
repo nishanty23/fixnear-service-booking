@@ -1,17 +1,18 @@
-
 const express = require("express");
 
 const {
   getCategories,
   createCategory,
   updateCategory,
-  deleteCategory
+  deleteCategory,
 } = require("../controllers/ProviderControllers/categoryController");
 
 const {
   authenticateUser,
-  authorizeRoles
+  authorizeRoles,
 } = require("../middleware/authMiddleware");
+
+const uploadImage = require("../middleware/uploadImage");
 
 const router = express.Router();
 
@@ -19,25 +20,31 @@ const router = express.Router();
 router.get("/", getCategories);
 
 // Admin-only routes
+
+// Create category with image
 router.post(
   "/",
   authenticateUser,
   authorizeRoles("ADMIN"),
-  createCategory
+  uploadImage.single("image"),
+  createCategory,
 );
 
+// Update category with optional image
 router.put(
   "/:id",
   authenticateUser,
   authorizeRoles("ADMIN"),
-  updateCategory
+  uploadImage.single("image"),
+  updateCategory,
 );
 
+// Delete category
 router.delete(
   "/:id",
   authenticateUser,
   authorizeRoles("ADMIN"),
-  deleteCategory
+  deleteCategory,
 );
 
 module.exports = router;

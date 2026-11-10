@@ -1,39 +1,44 @@
-
 const express = require("express");
 
 const {
   createService,
   updateService,
-  deleteService
+  deleteService,
 } = require("../controllers/ProviderControllers/serviceController");
 
 const {
   authenticateUser,
-  authorizeRoles
+  authorizeRoles,
 } = require("../middleware/authMiddleware");
+
+const uploadImage = require("../middleware/uploadImage");
 
 const router = express.Router();
 
-// Service provider-only routes
+// Create service with image upload
 router.post(
   "/",
   authenticateUser,
   authorizeRoles("SERVICE_PROVIDER"),
-  createService
+  uploadImage.single("image"),
+  createService,
 );
 
+// Update service with optional image upload
 router.put(
   "/:id",
   authenticateUser,
   authorizeRoles("SERVICE_PROVIDER"),
-  updateService
+  uploadImage.single("image"),
+  updateService,
 );
 
+// Soft-delete service
 router.delete(
   "/:id",
   authenticateUser,
   authorizeRoles("SERVICE_PROVIDER"),
-  deleteService
+  deleteService,
 );
 
 module.exports = router;
