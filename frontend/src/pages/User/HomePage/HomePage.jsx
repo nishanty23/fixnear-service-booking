@@ -279,7 +279,7 @@ const MostBookedServices = ({ services, loading, error }) => {
 
                 <div>
                     <h2 className="text-2xl font-semibold tracking-tight text-gray-950 md:text-3xl">
-                        Most booked services
+                        All available services
                     </h2>
 
                     <p className="mt-2 text-sm text-gray-500 md:text-base">
